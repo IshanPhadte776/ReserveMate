@@ -1,10 +1,10 @@
-// package com.IshanPhadteReserveMate.ReserveMate.Model;
+package com.IshanPhadteReserveMate.ReserveMate.Model;
 
-// import lombok.Data;
+import lombok.Data;
 
-// @Data
-// public class Reservation {
-//     private String name;
-//     private String phoneNumber;
-//     private String time;
-// }
+@Data
+public class Reservation {
+    private String name;
+    private String phoneNumber;
+    private String checkinTime;
+}

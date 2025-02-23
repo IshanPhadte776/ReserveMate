@@ -1,11 +1,10 @@
 package com.IshanPhadteReserveMate.ReserveMate;
 
-import java.util.Iterator;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -19,11 +18,11 @@ import org.springframework.stereotype.Service;
 @SpringBootApplication
 public class ReserveMateApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(ReserveMateApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(ReserveMateApplication.class, args);
+    }
 
-	@Service
+    @Service
     static class MessageProducer implements CommandLineRunner {
 
         private static final Logger logger = LoggerFactory.getLogger(MessageProducer.class);
@@ -31,14 +30,23 @@ public class ReserveMateApplication {
         @Autowired
         private JmsTemplate jmsTemplate;
 
+        private String generateRandomTopic() {
+            return "topic/dynamic/" + UUID.randomUUID().toString();
+        }
 
-        @Value("${solace.jms.demoQueueName}")
-        private String queueName;
+		@Override
+        public void run(String... args) {
+            String topic1 = generateRandomTopic();
+            String topic2 = generateRandomTopic();
 
-        public void run(String... strings) throws Exception {
-            String msg = "Hello World";
-            logger.info("============= Sending " + msg);
-            this.jmsTemplate.convertAndSend(queueName, msg);
+            String msg1 = "Hello from " + topic1;
+            String msg2 = "Hello from " + topic2;
+
+            logger.info("============= Sending to {}: {}", topic1, msg1);
+            jmsTemplate.convertAndSend(topic1, msg1);
+
+            logger.info("============= Sending to {}: {}", topic2, msg2);
+            jmsTemplate.convertAndSend(topic2, msg2);
         }
     }
 
@@ -47,21 +55,21 @@ public class ReserveMateApplication {
 
         private static final Logger logger = LoggerFactory.getLogger(MessageHandler.class);
 
-        // Retrieve the name of the queue from the application.properties file
-        @JmsListener(destination = "${solace.jms.demoQueueName}", containerFactory = "cFactory", concurrency = "2")
+        @JmsListener(destination = "topic/dynamic/#", containerFactory = "cFactory")
         public void processMsg(Message<?> msg) {
-        	StringBuffer msgAsStr = new StringBuffer("============= Received \nHeaders:");
-        	MessageHeaders hdrs = msg.getHeaders();
-        	msgAsStr.append("\nUUID: "+hdrs.getId());
-        	msgAsStr.append("\nTimestamp: "+hdrs.getTimestamp());
-        	Iterator<String> keyIter = hdrs.keySet().iterator();
-        	while (keyIter.hasNext()) {
-        		String key = keyIter.next();
-            	msgAsStr.append("\n"+key+": "+hdrs.get(key));
-        	}
-        	msgAsStr.append("\nPayload: "+msg.getPayload());
+            logMessage(msg);
+        }
+
+        private void logMessage(Message<?> msg) {
+            StringBuilder msgAsStr = new StringBuilder("============= Received \nHeaders:");
+            MessageHeaders hdrs = msg.getHeaders();
+            msgAsStr.append("\nUUID: " + hdrs.getId());
+            msgAsStr.append("\nTimestamp: " + hdrs.getTimestamp());
+            for (String key : hdrs.keySet()) {
+                msgAsStr.append("\n" + key + ": " + hdrs.get(key));
+            }
+            msgAsStr.append("\nPayload: " + msg.getPayload());
             logger.info(msgAsStr.toString());
         }
     }
-
 }
