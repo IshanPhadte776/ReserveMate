@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Reservation</title>
+    <script>
+        function sendReservation() {
+            const name = document.getElementById("name").value;
+            const phone = document.getElementById("phone").value;
+            const time = document.getElementById("time").value;
+
+            if (!name || !phone || !time) {
+                alert("Please fill in all fields!");
+                return;
+            }
+
+            fetch("http://localhost:8081/reservation/create", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                name: name,
+                phone: phone,
+                checkinTime: time
+            })
+        })
+            .then(response => response.text())
+            .then(data => alert(data))
+            .catch(error => alert("Error: " + error));
+        }
+    </script>
+</head>
+<body>
+    <h2>Make a Reservation</h2>
+    <label>Name:</label>
+    <input type="text" id="name"><br><br>
+
+    <label>Phone Number:</label>
+    <input type="text" id="phone"><br><br>
+
+    <label>Check-in Time:</label>
+    <input type="text" id="time"><br><br>
+
+    <button onclick="sendReservation()">Enter</button>
+</body>
+</html>
