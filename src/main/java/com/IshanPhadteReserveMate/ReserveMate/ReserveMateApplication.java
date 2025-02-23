@@ -43,10 +43,10 @@ public class ReserveMateApplication {
             String msg2 = "Hello from " + topic2;
 
             logger.info("============= Sending to {}: {}", topic1, msg1);
-            jmsTemplate.convertAndSend(topic1, msg1);
+            //jmsTemplate.convertAndSend(topic1, msg1);
 
             logger.info("============= Sending to {}: {}", topic2, msg2);
-            jmsTemplate.convertAndSend(topic2, msg2);
+            //jmsTemplate.convertAndSend(topic2, msg2);
         }
     }
 

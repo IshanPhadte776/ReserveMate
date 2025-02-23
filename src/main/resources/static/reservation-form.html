@@ -27,9 +27,14 @@
             })
         })
             .then(response => response.text())
-            .then(data => alert(data))
-            .catch(error => alert("Error: " + error));
+            .then(data => {
+                // If successful, redirect or display the confirmation page with QR code
+                document.body.innerHTML = data;  // Replace the content with the reservation details and QR code
+            })
         }
+
+
+
     </script>
 </head>
 <body>

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservation Created</title>
+</head>
+<body>
+    <h2>Reservation Created</h2>
+    <p>Reservation Details:</p>
+    <p><strong>Name:</strong> <span th:text="${reservationDetails}"></span></p>
+    <p><strong>QR Code:</strong> <img th:src="'data:image/png;base64,' + ${qrCode}" alt="QR Code" /></p>
+    <p><a th:href="${viewUrl}">Click here to view your reservation details</a></p>
+</body>
+</html>
