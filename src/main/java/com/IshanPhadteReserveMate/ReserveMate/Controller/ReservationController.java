@@ -3,6 +3,7 @@ package com.IshanPhadteReserveMate.ReserveMate.Controller;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,7 +19,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.IshanPhadteReserveMate.ReserveMate.Model.Reservation;
 import com.google.zxing.BarcodeFormat;
@@ -40,7 +40,7 @@ public class ReservationController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<String> createReservation(@RequestBody Reservation request, RedirectAttributes redirectAttributes) throws WriterException, IOException {
+    public ResponseEntity<Map<String, String>> createReservation(@RequestBody Reservation request, Model model) throws WriterException, IOException {
         String uniqueId = UUID.randomUUID().toString();
         String topicName = "dynamicTopic/" + uniqueId;
         
@@ -57,41 +57,35 @@ public class ReservationController {
         String reservationUrl = "http://localhost:8081/reservation/view/" + uniqueId;
         String qrCodeBase64 = generateQRCode(reservationUrl);
 
-        // Return ModelAndView with variables
-        // ModelAndView modelAndView = new ModelAndView("redirect:/reservation-created");
-        // modelAndView.addObject("reservationDetails", reservationDetails);
-        // modelAndView.addObject("qrCode", qrCodeBase64);
-        // modelAndView.addObject("viewUrl", "http://localhost:8081/reservation/view/" + uniqueId);
-        
-        // return modelAndView;
+        Map<String, String> responseBody = new HashMap<>();
+        responseBody.put("reservationDetails", reservationDetails);
+        responseBody.put("qrCode", qrCodeBase64);
+        responseBody.put("viewUrl", reservationUrl);
 
-        redirectAttributes.addFlashAttribute("reservationDetails", reservationDetails);
-        redirectAttributes.addFlashAttribute("qrCode", qrCodeBase64);
-        redirectAttributes.addFlashAttribute("viewUrl", reservationUrl);
-        
-        return ResponseEntity.ok(String.format("Reservation created successfully. View your reservation: <a href='%s'>%s</a><br> QR Code: <img src='data:image/png;base64,%s'/>", 
-                                          reservationUrl, reservationUrl, qrCodeBase64));
+        //return ResponseEntity.ok(responseBody);
+
+        // model.addAttribute("reservationDetails", reservationDetails);
+        // model.addAttribute("qrCode", qrCodeBase64);
+        // model.addAttribute("viewUrl", reservationUrl);
+
+        // return showReservationCreatedPage(model);
 
 
-        // // Return response with URL
-        // Map<String, String> response = new HashMap<>();
-        // response.put("message", "Reservation created successfully.");
-        // response.put("view_url", "http://localhost:8081/reservation/view/" + uniqueId);
-        // response.put("qr_code", qrCodeBase64);  // Include QR code in the response
+        // Return response in JSON format
+        return ResponseEntity.ok(responseBody);
         
-        // return ResponseEntity.ok(response);
+
     }
 
-    // @GetMapping("/reservation-created")
-    // public String showReservationCreatedPage(Model model) {
-    //     // Data already set in the previous request can be accessed here
-    //     return "reservation-created";  // Display the reservation-created page
-    // }
 
     @GetMapping("/reservation-created")
     public String showReservationCreatedPage(Model model) {
-        // Data will be passed from the POST request and displayed on the reservation-created page
-        return "reservation-created";  // This should refer to reservation-created.html in your templates folder
+
+        logger.info("Called Correctly");
+
+        model.asMap().forEach((key, value) -> logger.info("Model attribute: {} = {}", key, value));
+
+        return "reservation-created";
     }
 
 

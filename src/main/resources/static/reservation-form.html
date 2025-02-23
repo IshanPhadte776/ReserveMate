@@ -26,15 +26,22 @@
                 checkinTime: time
             })
         })
-            .then(response => response.text())
+            .then(response => response.json())
             .then(data => {
-                // If successful, redirect or display the confirmation page with QR code
-                document.body.innerHTML = data;  // Replace the content with the reservation details and QR code
+                // After the reservation is created, handle the rerouting based on the response
+                console.log(data); // Check the response data
+
+                // Store the data in localStorage if needed, or just use the data directly
+                localStorage.setItem('reservationDetails', JSON.stringify(data));
+
+                // Redirect to the reservation-created page
+                window.location.href = "http://localhost:8081/reservation-created.html";  
             })
+            .catch(error => {
+                console.error("Error creating reservation:", error);
+                alert("There was an error creating your reservation.");
+            });
         }
-
-
-
     </script>
 </head>
 <body>

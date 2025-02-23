@@ -4,12 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reservation Created</title>
+    <script>
+        window.onload = function() {
+            // Retrieve reservation data from localStorage
+            const reservationData = JSON.parse(localStorage.getItem('reservationDetails'));
+
+            if (reservationData) {
+                // Display reservation details
+                document.getElementById("reservationDetails").innerText = reservationData.reservationDetails;
+                document.getElementById("qrCode").src = 'data:image/png;base64,' + reservationData.qrCode;
+                document.getElementById("viewLink").href = reservationData.viewUrl;
+            } else {
+                // In case there's no data in localStorage
+                document.body.innerHTML = "<h2>Error: Reservation details not found!</h2>";
+            }
+        };
+    </script>
 </head>
 <body>
     <h2>Reservation Created</h2>
     <p>Reservation Details:</p>
-    <p><strong>Name:</strong> <span th:text="${reservationDetails}"></span></p>
-    <p><strong>QR Code:</strong> <img th:src="'data:image/png;base64,' + ${qrCode}" alt="QR Code" /></p>
-    <p><a th:href="${viewUrl}">Click here to view your reservation details</a></p>
+    <p><strong>Name:</strong> <span id="reservationDetails"></span></p>
+    <p><strong>QR Code:</strong> <img id="qrCode" alt="QR Code" /></p>
+    <p><a id="viewLink" target="_blank">Click here to view your reservation details</a></p>
 </body>
 </html>
