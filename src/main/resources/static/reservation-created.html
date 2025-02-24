@@ -11,7 +11,9 @@
 
             if (reservationData) {
                 // Display reservation details
-                document.getElementById("reservationDetails").innerText = reservationData.reservationDetails;
+                document.getElementById("reservationName").innerText = reservationData.name;
+                document.getElementById("reservationPhone").innerText = reservationData.phoneNumber;
+                document.getElementById("reservationCheckinTime").innerText = reservationData.checkinTime;
                 document.getElementById("qrCode").src = 'data:image/png;base64,' + reservationData.qrCode;
                 document.getElementById("viewLink").href = reservationData.viewUrl;
             } else {
@@ -23,8 +25,9 @@
 </head>
 <body>
     <h2>Reservation Created</h2>
-    <p>Reservation Details:</p>
-    <p><strong>Name:</strong> <span id="reservationDetails"></span></p>
+    <p><strong>Name:</strong> <span id="reservationName"></span></p>
+    <p><strong>Phone Number:</strong> <span id="reservationPhone"></span></p>
+    <p><strong>Check-in Time:</strong> <span id="reservationCheckinTime"></span></p>
     <p><strong>QR Code:</strong> <img id="qrCode" alt="QR Code" /></p>
     <p><a id="viewLink" target="_blank">Click here to view your reservation details</a></p>
 </body>

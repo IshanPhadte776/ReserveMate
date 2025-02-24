@@ -4,12 +4,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.view.RedirectView;
 
 @Controller
 public class LoginController {
     @GetMapping("/")
-    public String showLoginPage() {
-        return "redirect:/login.html";  // Render the login.html page when accessing localhost:8081
+    public RedirectView showLoginPage() {
+        //return "redirect:/login.html";  // Render the login.html page when accessing localhost:8081
+        return new RedirectView("/login.html");
     }
 
     @PostMapping("/admin-login")

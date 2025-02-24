@@ -5,10 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Restaurant Reservation</title>
     <script>
+        function formatDateTime() {
+            const now = new Date();
+
+            // Get month name
+            const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+                                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const month = monthNames[now.getMonth()];
+
+            // Get day, hour, and minute
+            const day = now.getDate();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+
+            // Format: "Month Day, HH:MM"
+            return `${month} ${day}, ${hours}:${minutes}`;
+        }
+
         function sendReservation() {
             const name = document.getElementById("name").value;
             const phone = document.getElementById("phone").value;
-            const time = document.getElementById("time").value;
+            const time = document.getElementById("time").value = formatDateTime();
+            
 
             if (!name || !phone || !time) {
                 alert("Please fill in all fields!");
@@ -22,7 +40,7 @@
             },
             body: JSON.stringify({
                 name: name,
-                phone: phone,
+                phoneNumber: phone,
                 checkinTime: time
             })
         })

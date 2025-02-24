@@ -7,4 +7,5 @@ public class Reservation {
     private String name;
     private String phoneNumber;
     private String checkinTime;
+    private String uniqueID;
 }

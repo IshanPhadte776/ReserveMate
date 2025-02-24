@@ -1,108 +1,79 @@
 package com.IshanPhadteReserveMate.ReserveMate.Controller;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jms.core.JmsTemplate;
-import org.springframework.ui.Model;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.IshanPhadteReserveMate.ReserveMate.Model.Reservation;
-import com.google.zxing.BarcodeFormat;
+import com.IshanPhadteReserveMate.ReserveMate.Service.ReservationService;
+import com.IshanPhadteReserveMate.ReserveMate.Utils.QRCodeGenerator;
 import com.google.zxing.WriterException;
-import com.google.zxing.client.j2se.MatrixToImageWriter;
-import com.google.zxing.common.BitMatrix;
-import com.google.zxing.qrcode.QRCodeWriter;
 
-@org.springframework.stereotype.Controller
+@Controller
 @RequestMapping("/reservation")
 public class ReservationController {
 
-    private final Map<String, String> reservations = new ConcurrentHashMap<>();
+    private final ReservationService reservationService;
     private final JmsTemplate jmsTemplate;
     private static final Logger logger = LoggerFactory.getLogger(ReservationController.class);
 
-    public ReservationController(JmsTemplate jmsTemplate) {
+    public ReservationController(ReservationService reservationService,JmsTemplate jmsTemplate) {
+        this.reservationService = reservationService;
         this.jmsTemplate = jmsTemplate;
     }
-
     @PostMapping("/create")
-    public ResponseEntity<Map<String, String>> createReservation(@RequestBody Reservation request, Model model) throws WriterException, IOException {
-        String uniqueId = UUID.randomUUID().toString();
-        String topicName = "updates/" + uniqueId;
-        
-        String reservationDetails = String.format("Name: %s, Phone Number: %s, Check-in Time: %s",
-                request.getName(), request.getPhoneNumber(), request.getCheckinTime());
+    public ResponseEntity<Map<String, String>> createReservation(@RequestBody Map<String, String> request) throws WriterException, IOException {
+        logger.info("Original Request: {}", request);
 
-        // Save reservation
-        reservations.put(uniqueId, reservationDetails);
 
-        // Send message to the dynamically generated topic
-        jmsTemplate.convertAndSend(topicName, reservationDetails);
-        logger.info("Reservation created: {} -> {}", topicName, reservationDetails);
+        Map<String, String> savedReservation = reservationService.createReservation(request);
 
-        String reservationUrl = "http://localhost:8081/reservation/view/" + uniqueId;
-        String qrCodeBase64 = generateQRCode(reservationUrl);
+        String reservationUrl = "http://localhost:8081/reservation/view/" + savedReservation.get("uniqueID");
+        String qrCodeBase64 = QRCodeGenerator.generateQRCode(reservationUrl);
 
         Map<String, String> responseBody = new HashMap<>();
-        responseBody.put("reservationDetails", reservationDetails);
-        responseBody.put("qrCode", qrCodeBase64);
         responseBody.put("viewUrl", reservationUrl);
+        responseBody.put("qrCode", qrCodeBase64);
+        responseBody.put("name", savedReservation.get("name"));
+        responseBody.put("phoneNumber", savedReservation.get("phoneNumber"));
+        responseBody.put("checkinTime", savedReservation.get("checkinTime"));
+        responseBody.put("uniqueID", savedReservation.get("uniqueID"));
 
-        // Return response in JSON format
+        logger.info("Reservation created with response data: {}", responseBody);
+
+
+
         return ResponseEntity.ok(responseBody);
-        
-
+    }
+    
+    @GetMapping("/queues")
+    public Map<String, Map<String, String>> getAllReservations() {
+        return reservationService.getAllReservations();
     }
 
 
-    // @GetMapping("/reservation-created")
-    // public String showReservationCreatedPage(Model model) {
 
-    //     logger.info("Called Correctly");
 
-    //     model.asMap().forEach((key, value) -> logger.info("Model attribute: {} = {}", key, value));
+    // @GetMapping("/view/{id}")
+    // public ResponseEntity<?> viewReservation(@PathVariable String id) {
 
-    //     return "reservation-created";
+    //     String reservationDetails = reservations.get(id);
+    //     if (reservationDetails == null) {
+    //         logger.warn("Reservation not found for ID: {}", id);
+    //         return ResponseEntity.status(HttpStatus.NOT_FOUND)
+    //                 .body(Map.of("error", "Reservation not found."));
+    //     }
+
+    //     return ResponseEntity.ok(Map.of("reservation", reservationDetails));
     // }
-
-
-    @GetMapping("/view/{id}")
-    public ResponseEntity<?> viewReservation(@PathVariable String id) {
-        logger.info("Retrieving reservation for ID: {}", id);
-
-        String reservationDetails = reservations.get(id);
-        if (reservationDetails == null) {
-            logger.warn("Reservation not found for ID: {}", id);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("error", "Reservation not found."));
-        }
-
-        return ResponseEntity.ok(Map.of("reservation", reservationDetails));
-    }
-
-    private String generateQRCode(String text) throws WriterException, IOException {
-        QRCodeWriter qrCodeWriter = new QRCodeWriter();
-        BitMatrix bitMatrix = qrCodeWriter.encode(text, BarcodeFormat.QR_CODE, 250, 250);
-
-        ByteArrayOutputStream pngOutputStream = new ByteArrayOutputStream();
-        MatrixToImageWriter.writeToStream(bitMatrix, "PNG", pngOutputStream);
-        byte[] qrBytes = pngOutputStream.toByteArray();
-
-        return Base64.getEncoder().encodeToString(qrBytes); // Return as Base64 for embedding in HTML
-    }
 
 }
