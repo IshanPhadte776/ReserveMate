@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Table Updates</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f2f2f7; padding: 20px; }
+        .chat-container { max-width: 400px; margin: auto; background: white; padding: 15px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0,0,0,0.2); }
+        .message { padding: 10px; margin: 5px; border-radius: 8px; max-width: 80%; }
+        .admin { background-color: #007aff; color: white; text-align: left; float: left; clear: both; }
+        .customer { background-color: #e5e5ea; text-align: right; float: right; clear: both; }
+        .messages { overflow-y: auto; max-height: 400px; display: flex; flex-direction: column; }
+        .input-container { display: flex; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="chat-container">
+        <h3>Live Table Updates</h3>
+        <div id="chat-box" class="messages"></div>
+    </div>
+
+    <script>
+        // Simulate retrieving phone number (e.g., from login session)
+        const phoneNumber = localStorage.getItem("customerPhoneNumber") || "1234567890";
+
+        const eventSource = new EventSource(`http://localhost:8081/updates/stream/${phoneNumber}`);
+
+        eventSource.onmessage = function(event) {
+            const chatBox = document.getElementById("chat-box");
+            const messageDiv = document.createElement("div");
+
+            messageDiv.textContent = event.data;
+            messageDiv.classList.add("message", "admin");
+
+            chatBox.appendChild(messageDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        };
+    </script>
+
+</body>
+</html>

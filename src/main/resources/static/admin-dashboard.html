@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+</head>
+<body>
+    <h1>Welcome to the Admin Dashboard!</h1>
+    <p>You're successfully logged in.</p>
+
+    <div class="buttons">
+        <!-- Log Off Button -->
+        <form action="/logoff" method="get">
+            <button class="log-off-btn" type="submit">Log Off</button>
+        </form>
+
+        <!-- Check-in People Button -->
+        <form action="/check-in" method="get">
+            <button class="checkin-btn" type="submit">Check-in People</button>
+        </form>
+
+        <!-- View Queue Button -->
+        <form action="/queue" method="get">
+            <button class="queue-btn" type="submit">View Queue</button>
+        </form>
+
+        <!-- Manage Tables Button -->
+        <form action="/tables" method="get">
+            <button class="tables-btn" type="submit">Manage Tables</button>
+        </form>
+    </div>
+</body>
+</html>

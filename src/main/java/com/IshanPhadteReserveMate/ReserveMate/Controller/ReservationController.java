@@ -42,7 +42,7 @@ public class ReservationController {
     @PostMapping("/create")
     public ResponseEntity<Map<String, String>> createReservation(@RequestBody Reservation request, Model model) throws WriterException, IOException {
         String uniqueId = UUID.randomUUID().toString();
-        String topicName = "dynamicTopic/" + uniqueId;
+        String topicName = "updates/" + uniqueId;
         
         String reservationDetails = String.format("Name: %s, Phone Number: %s, Check-in Time: %s",
                 request.getName(), request.getPhoneNumber(), request.getCheckinTime());
@@ -62,15 +62,6 @@ public class ReservationController {
         responseBody.put("qrCode", qrCodeBase64);
         responseBody.put("viewUrl", reservationUrl);
 
-        //return ResponseEntity.ok(responseBody);
-
-        // model.addAttribute("reservationDetails", reservationDetails);
-        // model.addAttribute("qrCode", qrCodeBase64);
-        // model.addAttribute("viewUrl", reservationUrl);
-
-        // return showReservationCreatedPage(model);
-
-
         // Return response in JSON format
         return ResponseEntity.ok(responseBody);
         
@@ -78,15 +69,15 @@ public class ReservationController {
     }
 
 
-    @GetMapping("/reservation-created")
-    public String showReservationCreatedPage(Model model) {
+    // @GetMapping("/reservation-created")
+    // public String showReservationCreatedPage(Model model) {
 
-        logger.info("Called Correctly");
+    //     logger.info("Called Correctly");
 
-        model.asMap().forEach((key, value) -> logger.info("Model attribute: {} = {}", key, value));
+    //     model.asMap().forEach((key, value) -> logger.info("Model attribute: {} = {}", key, value));
 
-        return "reservation-created";
-    }
+    //     return "reservation-created";
+    // }
 
 
     @GetMapping("/view/{id}")
