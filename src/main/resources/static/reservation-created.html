@@ -15,7 +15,9 @@
                 document.getElementById("reservationPhone").innerText = reservationData.phoneNumber;
                 document.getElementById("reservationCheckinTime").innerText = reservationData.checkinTime;
                 document.getElementById("qrCode").src = 'data:image/png;base64,' + reservationData.qrCode;
-                document.getElementById("viewLink").href = reservationData.viewUrl;
+                document.getElementById("viewLink").href = '/customerMessages.html?uniqueID=' + reservationData.uniqueID;  // Set the uniqueID in the URL
+                
+                console.log(reservationData.uniqueID)
             } else {
                 // In case there's no data in localStorage
                 document.body.innerHTML = "<h2>Error: Reservation details not found!</h2>";
@@ -29,6 +31,8 @@
     <p><strong>Phone Number:</strong> <span id="reservationPhone"></span></p>
     <p><strong>Check-in Time:</strong> <span id="reservationCheckinTime"></span></p>
     <p><strong>QR Code:</strong> <img id="qrCode" alt="QR Code" /></p>
-    <p><a id="viewLink" target="_blank">Click here to view your reservation details</a></p>
+    <form action="/admin/tables" method="get">
+        <button id="viewLink" type="submit">Click here to view your reservation details</button>
+    </form>
 </body>
 </html>

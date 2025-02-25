@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Send Message</title>
+    <script>
+        function sendMessage() {
+            const uniqueID = document.getElementById("uniqueID").value;
+            const message = document.getElementById("message").value;
+
+            if (!uniqueID || !message) {
+                alert("Please enter a unique ID and message.");
+                return;
+            }
+
+            fetch("http://localhost:8081/messaging/send-message", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    uniqueID: uniqueID,
+                    message: message
+                })
+            })
+            .then(response => response.json())
+            .then(data => alert(data.status))
+            .catch(error => console.error("Error:", error));
+        }
+    </script>
+</head>
+<body>
+    <h2>Admin - Send Message to Customer</h2>
+    <label>Customer Unique ID:</label>
+    <input type="text" id="uniqueID"><br><br>
+
+    <label>Message:</label>
+    <input type="text" id="message"><br><br>
+
+    <button onclick="sendMessage()">Send Message</button>
+</body>
+</html>

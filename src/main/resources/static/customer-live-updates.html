@@ -3,41 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Table Updates</title>
+    <title>Customer Messages</title>
+    <script>
+        window.onload = function() {
+            // Retrieve the uniqueID from the URL parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const uniqueID = urlParams.get('uniqueID');
+
+            if (uniqueID) {
+                // Fetch the messages for the given uniqueID
+                fetchMessages(uniqueID);
+            } else {
+                document.body.innerHTML = "<h2>Error: uniqueID is missing!</h2>";
+            }
+        };
+
+        // Function to fetch messages from the backend
+        function fetchMessages(uniqueID) {
+            const messagesContainer = document.getElementById("messages");
+
+            fetch(`/messaging/getUpdates?uniqueID=${uniqueID}`)
+                .then(response => response.json())
+                .then(messages => {
+                    if (messages && messages.length > 0) {
+                        messages.forEach(message => {
+                            const messageElement = document.createElement("div");
+                            messageElement.classList.add("message");
+                            messageElement.innerText = message;
+                            messagesContainer.appendChild(messageElement);
+                        });
+                    } else {
+                        messagesContainer.innerHTML = "<p>No messages found for this reservation.</p>";
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching messages:', error);
+                    messagesContainer.innerHTML = "<p>Error retrieving messages.</p>";
+                });
+        }
+    </script>
     <style>
         body { font-family: Arial, sans-serif; background-color: #f2f2f7; padding: 20px; }
-        .chat-container { max-width: 400px; margin: auto; background: white; padding: 15px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0,0,0,0.2); }
-        .message { padding: 10px; margin: 5px; border-radius: 8px; max-width: 80%; }
-        .admin { background-color: #007aff; color: white; text-align: left; float: left; clear: both; }
-        .customer { background-color: #e5e5ea; text-align: right; float: right; clear: both; }
-        .messages { overflow-y: auto; max-height: 400px; display: flex; flex-direction: column; }
-        .input-container { display: flex; margin-top: 10px; }
+        .message-container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); }
+        .message { padding: 10px; margin: 10px 0; border-radius: 8px; background-color: #007aff; color: white; }
+        h1 { text-align: center; }
     </style>
 </head>
 <body>
 
-    <div class="chat-container">
-        <h3>Live Table Updates</h3>
-        <div id="chat-box" class="messages"></div>
+    <div class="message-container">
+        <h1>Customer Messages</h1>
+        <div id="messages"></div>
     </div>
-
-    <script>
-        // Simulate retrieving phone number (e.g., from login session)
-        const phoneNumber = localStorage.getItem("customerPhoneNumber") || "1234567890";
-
-        const eventSource = new EventSource(`http://localhost:8081/updates/stream/${phoneNumber}`);
-
-        eventSource.onmessage = function(event) {
-            const chatBox = document.getElementById("chat-box");
-            const messageDiv = document.createElement("div");
-
-            messageDiv.textContent = event.data;
-            messageDiv.classList.add("message", "admin");
-
-            chatBox.appendChild(messageDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        };
-    </script>
 
 </body>
 </html>
