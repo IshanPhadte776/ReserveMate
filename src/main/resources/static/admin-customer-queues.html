@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Customer Reservation Queue</title>
+    <script>
+        // Function to fetch reservations from the back-end and display them
+        function loadCustomerQueue() {
+            fetch("http://localhost:8081/reservation/customer-queue")
+    .then(response => response.json())
+    .then(data => {
+        if (!data || Object.keys(data).length === 0) {
+            console.warn("No reservations found.");
+            document.getElementById("reservationQueue").innerHTML = "<li>No reservations in the queue.</li>";
+            return;
+        }
+
+        const queueContainer = document.getElementById("reservationQueue");
+        queueContainer.innerHTML = ""; // Clear existing content
+
+        Object.values(data).forEach((reservation, index) => {
+            const listItem = document.createElement("li");
+            listItem.innerHTML = `#${index + 1} - Name: ${reservation.name}, Phone: ${reservation.phoneNumber}, Check-in Time: ${reservation.checkinTime}`;
+            queueContainer.appendChild(listItem);
+        });
+    })
+    .catch(error => {
+        console.error("Error fetching reservations:", error);
+        alert("There was an error loading the reservation queue.");
+    });
+
+
+                
+        }
+
+        // Load the customer queue when the page is loaded
+        window.onload = loadCustomerQueue;
+    </script>
+</head>
+<body>
+    <h2>Admin - Customer Reservation Queue</h2>
+    <ul id="reservationQueue">
+        <!-- Reservations will be dynamically populated here -->
+    </ul>
+</body>
+</html>

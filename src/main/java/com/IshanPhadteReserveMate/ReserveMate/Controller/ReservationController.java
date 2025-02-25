@@ -1,7 +1,9 @@
 package com.IshanPhadteReserveMate.ReserveMate.Controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -34,7 +36,6 @@ public class ReservationController {
     public ResponseEntity<Map<String, String>> createReservation(@RequestBody Map<String, String> request) throws WriterException, IOException {
         logger.info("Original Request: {}", request);
 
-
         Map<String, String> savedReservation = reservationService.createReservation(request);
 
         String reservationUrl = "http://localhost:8081/reservation/view/" + savedReservation.get("uniqueID");
@@ -55,12 +56,14 @@ public class ReservationController {
         return ResponseEntity.ok(responseBody);
     }
     
-    @GetMapping("/queues")
-    public Map<String, Map<String, String>> getAllReservations() {
-        return reservationService.getAllReservations();
+    @GetMapping("/customer-queue")
+    public ResponseEntity<List<Map<String, String>>> getCustomerQueue() {
+        Map<String, Map<String, String>> reservations = reservationService.getAllReservations();
+
+        List<Map<String, String>> reservationList = new ArrayList<>(reservations.values());
+
+        return ResponseEntity.ok(reservationList);
     }
-
-
 
 
     // @GetMapping("/view/{id}")
