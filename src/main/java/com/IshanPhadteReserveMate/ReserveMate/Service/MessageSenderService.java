@@ -2,7 +2,6 @@ package com.IshanPhadteReserveMate.ReserveMate.Service;
 
 
 import org.springframework.jms.core.JmsTemplate;
-import org.springframework.messaging.Message;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,7 +15,7 @@ public class MessageSenderService {
 
     // Method to send a message to a specific customer's topic
     public void sendMessage(String customerID, String message) {
-        String destination = "updates/" + customerID;  // Customer-specific topic
+        String destination = "messages/subscribe" + customerID;  // Customer-specific topic
         jmsTemplate.convertAndSend(destination, message);
     }
 }

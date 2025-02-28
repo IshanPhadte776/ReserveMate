@@ -1,54 +1,54 @@
 package com.IshanPhadteReserveMate.ReserveMate.Service;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jms.annotation.JmsListener;
-import org.springframework.messaging.Message;
-import org.springframework.messaging.MessageHeaders;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-@Component
+@Service
 public class MessageHandlerService {
 
     private static final Logger logger = LoggerFactory.getLogger(MessageHandlerService.class);
 
-    // Map to store messages per customer (uniqueID -> List of messages)
-    private final Map<String, List<String>> customerMessages = new ConcurrentHashMap<>();
+    // Map to hold the SseEmitters for each uniqueID (client)
+    private final Map<String, SseEmitter> clientEmitters = new ConcurrentHashMap<>();
 
-    @JmsListener(destination = "updates/#", containerFactory = "cFactory")
-    public void handleMessage(Message<String> msg) {
-        logMessageDetails(msg);
+    // Register a new client for receiving messages (via SseEmitter)
+    public SseEmitter registerClient(String uniqueID) {
+        SseEmitter emitter = new SseEmitter(0L); // No timeout (client decides when to disconnect)
+        logger.info("Received message for {}: {}", uniqueID);  // Log message
 
-        // Extract the uniqueID from the destination
-        String destination = msg.getHeaders().get("jms_destination").toString();
-        String uniqueID = destination.substring(destination.lastIndexOf("/") + 1);
-
-        // Get the list of messages for this customer (uniqueID)
-        List<String> messagesForCustomer = customerMessages.computeIfAbsent(uniqueID, k -> new ArrayList<>());
-        messagesForCustomer.add(msg.getPayload()); // Add the new message
-
-        logger.info("Message added for uniqueID: {} -> {}", uniqueID, msg.getPayload());
+        emitter.onTimeout(() -> {
+            logger.info("Client " + uniqueID + " timed out.");
+            emitter.complete();
+        });
+    
+        emitter.onCompletion(() -> {
+            logger.info("Client " + uniqueID + " disconnected.");
+        });
+    
+        // Store emitter for sending messages later
+        clientEmitters.put(uniqueID, emitter);
+    
+        return emitter;
     }
+    
 
-    // Method to retrieve messages for a specific customer by uniqueID
-    public List<String> getMessagesForCustomer(String uniqueID) {
-        return customerMessages.getOrDefault(uniqueID, new ArrayList<>());
-    }
-
-    private void logMessageDetails(Message<?> msg) {
-        StringBuilder msgDetails = new StringBuilder("============= Received \nHeaders:");
-        MessageHeaders headers = msg.getHeaders();
-        msgDetails.append("\nUUID: ").append(headers.getId());
-        msgDetails.append("\nTimestamp: ").append(headers.getTimestamp());
-        for (String key : headers.keySet()) {
-            msgDetails.append("\n").append(key).append(": ").append(headers.get(key));
+    // Send a message to a specific client (via their uniqueID)
+    public void sendMessageToClient(String uniqueID, String message) {
+        SseEmitter emitter = clientEmitters.get(uniqueID);
+        if (emitter != null) {
+            try {
+                emitter.send(message);  // Send message to the client
+                logger.info("Message sent to client {}: {}", uniqueID, message);
+            } catch (Exception e) {
+                logger.error("Failed to send message to client {}: {}", uniqueID, e.getMessage());
+            }
+        } else {
+            logger.warn("No active client found for uniqueID: {}", uniqueID);
         }
-        msgDetails.append("\nPayload: ").append(msg.getPayload());
-        logger.info(msgDetails.toString());
     }
 }

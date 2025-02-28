@@ -3,58 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer Messages</title>
-    <script>
-        window.onload = function() {
-            // Retrieve the uniqueID from the URL parameter
-            const urlParams = new URLSearchParams(window.location.search);
-            const uniqueID = urlParams.get('uniqueID');
-
-            if (uniqueID) {
-                // Fetch the messages for the given uniqueID
-                fetchMessages(uniqueID);
-            } else {
-                document.body.innerHTML = "<h2>Error: uniqueID is missing!</h2>";
-            }
-        };
-
-        // Function to fetch messages from the backend
-        function fetchMessages(uniqueID) {
-            const messagesContainer = document.getElementById("messages");
-
-            fetch(`/messaging/getUpdates?uniqueID=${uniqueID}`)
-                .then(response => response.json())
-                .then(messages => {
-                    if (messages && messages.length > 0) {
-                        messages.forEach(message => {
-                            const messageElement = document.createElement("div");
-                            messageElement.classList.add("message");
-                            messageElement.innerText = message;
-                            messagesContainer.appendChild(messageElement);
-                        });
-                    } else {
-                        messagesContainer.innerHTML = "<p>No messages found for this reservation.</p>";
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching messages:', error);
-                    messagesContainer.innerHTML = "<p>Error retrieving messages.</p>";
-                });
-        }
-    </script>
+    <title>Customer Reservation - Live Updates</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f2f2f7; padding: 20px; }
-        .message-container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); }
-        .message { padding: 10px; margin: 10px 0; border-radius: 8px; background-color: #007aff; color: white; }
-        h1 { text-align: center; }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h2 {
+            color: #333;
+        }
+        .message {
+            background-color: #f0f0f0;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+        }
+        .message p {
+            margin: 0;
+        }
+        .error {
+            color: red;
+        }
     </style>
 </head>
 <body>
+    <h2>Your Reservation Status</h2>
 
-    <div class="message-container">
-        <h1>Customer Messages</h1>
-        <div id="messages"></div>
+    <!-- Display Reservation Details -->
+    <div>
+        <p><strong>Name:</strong> <span id="reservationName"></span></p>
+        <p><strong>Phone Number:</strong> <span id="reservationPhone"></span></p>
+        <p><strong>Check-in Time:</strong> <span id="reservationCheckinTime"></span></p>
+        <p><strong>QR Code:</strong> <img id="qrCode" alt="QR Code" /></p>
+        <button id="viewLink">View Your Reservation Details</button>
     </div>
 
+    <!-- Message Section -->
+    <h3>Live Updates</h3>
+    <div id="messages"></div>
+
+    <!-- Error message -->
+    <div id="errorMessage" class="error" style="display: none;">
+        <p>Could not connect to the live updates. Please try again later.</p>
+    </div>
+
+    <script>
+        window.onload = function() {
+            // Retrieve reservation data from localStorage
+            const reservationData = JSON.parse(localStorage.getItem('reservationDetails'));
+
+            if (reservationData) {
+                // Display reservation details
+                document.getElementById("reservationName").innerText = reservationData.name;
+                document.getElementById("reservationPhone").innerText = reservationData.phoneNumber;
+                document.getElementById("reservationCheckinTime").innerText = reservationData.checkinTime;
+                document.getElementById("qrCode").src = 'data:image/png;base64,' + reservationData.qrCode;
+                document.getElementById("viewLink").href = '/customerMessages.html?uniqueID=' + reservationData.uniqueID;
+
+                // Subscribe to live updates
+                subscribeToLiveUpdates(reservationData.uniqueID);
+            } else {
+                // If no data is available in localStorage
+                document.body.innerHTML = "<h2>Error: Reservation details not found!</h2>";
+            }
+        };
+
+        function subscribeToLiveUpdates(uniqueID) {
+            //const eventSource = new EventSource(`/messages/subscribe/${uniqueID}`);
+            const eventSource = new EventSource(`/Hello`);
+
+            console.log("Connecting to")
+
+
+            eventSource.onmessage = function(event) {
+                const newMessage = event.data;
+                displayMessage(newMessage);
+            };
+
+            eventSource.onerror = function() {
+                document.getElementById("errorMessage").style.display = "block";
+            };
+        }
+
+        function displayMessage(message) {
+            const messagesDiv = document.getElementById("messages");
+            const messageElement = document.createElement("div");
+            messageElement.classList.add("message");
+            messageElement.innerHTML = `<p>${message}</p>`;
+            messagesDiv.appendChild(messageElement);
+        }
+    </script>
 </body>
 </html>
