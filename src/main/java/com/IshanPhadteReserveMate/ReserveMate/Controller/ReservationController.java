@@ -1,13 +1,13 @@
 package com.IshanPhadteReserveMate.ReserveMate.Controller;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Controller;
@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.IshanPhadteReserveMate.ReserveMate.Model.Reservation;
 import com.IshanPhadteReserveMate.ReserveMate.Service.ReservationService;
 import com.IshanPhadteReserveMate.ReserveMate.Utils.QRCodeGenerator;
 import com.google.zxing.WriterException;
@@ -55,15 +56,41 @@ public class ReservationController {
 
         return ResponseEntity.ok(responseBody);
     }
-    
-    @GetMapping("/customer-queue")
-    public ResponseEntity<List<Map<String, String>>> getCustomerQueue() {
-        Map<String, Map<String, String>> reservations = reservationService.getAllReservations();
 
-        List<Map<String, String>> reservationList = new ArrayList<>(reservations.values());
-
-        return ResponseEntity.ok(reservationList);
+     // Get all active reservations
+    @GetMapping("/getReservations")
+    public ResponseEntity<List<Reservation>> getReservations() {
+        System.out.println("Called");
+        List<Reservation> reservations = reservationService.getAllActiveReservations();
+        System.out.println(reservations);
+        if (reservations.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);  // No reservations found
+        }
+        return new ResponseEntity<>(reservations, HttpStatus.OK);  // Return active reservations
     }
+    
+    // @GetMapping("/customer-queue")
+    // public ResponseEntity<List<Map<String, String>>> getCustomerQueue() {
+    //     // Fetch all reservations from MongoDB
+    //     Iterable<Reservation> allReservations = reservationService.getAllReservations();
+
+    //     // Convert Iterable to List and extract relevant details (assuming 'name', 'phoneNumber', etc.)
+    //     List<Map<String, String>> reservationList = StreamSupport.stream(allReservations.spliterator(), false)
+    //             .map(reservation -> {
+    //                 Map<String, String> reservationDetails = reservation.getReservationDetails(); // Assuming reservation has a map with details
+    //                 return Map.of(
+    //                         "viewUrl", "/customerMessages.html?uniqueID=" + reservation.getUniqueID(),
+    //                         "qrCode", reservationDetails.get("qrCode"), // Assuming QR code is stored here
+    //                         "name", reservationDetails.get("name"),
+    //                         "phoneNumber", reservationDetails.get("phoneNumber"),
+    //                         "checkinTime", reservationDetails.get("checkinTime"),
+    //                         "uniqueID", reservation.getUniqueID()
+    //                 );
+    //             })
+    //             .collect(Collectors.toList());
+
+    //     return ResponseEntity.ok(reservationList);
+    // }
 
 
     // @GetMapping("/view/{id}")

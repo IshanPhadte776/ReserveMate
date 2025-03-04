@@ -1,5 +1,6 @@
 package com.IshanPhadteReserveMate.ReserveMate.Service;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -9,15 +10,19 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 
+import com.IshanPhadteReserveMate.ReserveMate.Model.Reservation;
+import com.IshanPhadteReserveMate.ReserveMate.Repository.ReservationRepository;
+
 @Service
 public class ReservationService {
+    private final ReservationRepository reservationRepository;
     private final Map<String, Map<String,String>> reservations = new ConcurrentHashMap<>();
     private final JmsTemplate jmsTemplate;
     private static final Logger logger = LoggerFactory.getLogger(ReservationService.class);
 
-    public ReservationService(JmsTemplate jmsTemplate) {
-        
+    public ReservationService(JmsTemplate jmsTemplate, ReservationRepository reservationRepository) {
         this.jmsTemplate = jmsTemplate;
+        this.reservationRepository = reservationRepository;
     }
 
     public Map<String,String> createReservation(Map<String,String> request) {
@@ -34,8 +39,18 @@ public class ReservationService {
         return request; // Return full reservation object
     }
 
-    // Get all active reservations
-    public Map<String, Map<String,String>> getAllReservations() {
-        return reservations;
+
+    public Reservation getReservationByID(String reservationID) {
+        return reservationRepository.findByReservationID(reservationID).orElseThrow(() -> new RuntimeException("Reservation not found"));
     }
+
+    public Reservation getReservationByPhoneNumber(String phoneNumber) {
+        return reservationRepository.findByCustomerPhoneNumber(phoneNumber)
+            .orElseThrow(() -> new RuntimeException("Reservation not found with Phone Number: " + phoneNumber));
+    }
+
+    public List<Reservation> getAllActiveReservations() {
+        return reservationRepository.findByStatusNot("left");  // Filter out "left" reservations
+    }
+
 }

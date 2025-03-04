@@ -3,8 +3,6 @@ package com.IshanPhadteReserveMate.ReserveMate.Controller;
 //mvn spring-boot:run
 
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.view.RedirectView;
 
@@ -35,17 +33,17 @@ public class AdminDashboardController {
     }
 
     // Route for View Queue
-    @RequestMapping("/queue")
+    @RequestMapping("/customer-queues")
     public RedirectView viewQueue() {
         return new RedirectView("/admin-customer-queues.html"); // Redirect to the queue page
     }
 
-    @GetMapping("/queues")
-    public RedirectView showAdminPage(Model model) {
-        model.addAttribute("reservations", reservationService.getAllReservations());
-        //return "admin-customer-queues";
-        return new RedirectView("/admin-customer-queues.html"); // Redirect to the queue page
-    }
+    // @GetMapping("/customer-queues")
+    // public RedirectView showAdminPage(Model model) {
+    //     //model.addAttribute("reservations", reservationService.getAllActiveReservations()());
+    //     //return "admin-customer-queues";
+    //     return new RedirectView("/admin-customer-queues.html"); // Redirect to the queue page
+    // }
 
     // Route for Manage Tables
     @RequestMapping("/tables")
