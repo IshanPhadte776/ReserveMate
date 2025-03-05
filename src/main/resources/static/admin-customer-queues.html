@@ -4,44 +4,181 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Customer Reservation Queue</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            padding: 20px;
+            max-width: 90%;
+            margin: auto;
+        }
+        .column {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            min-height: 250px;
+        }
+        .column h3 {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .reservation {
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+            text-align: left;
+            position: relative;
+        }
+        .reservation:last-child {
+            border-bottom: none;
+        }
+        .reservation a {
+            text-decoration: none;
+            color: blue;
+        }
+        .qr-code img {
+            max-width: 50px;
+            display: block;
+            margin: 5px 0;
+        }
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+        }
+        .controls button {
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-size: 18px;
+            color: #333;
+        }
+    </style>
     <script>
-        // Function to fetch reservations from the back-end and display them
         function loadCustomerQueue() {
-            fetch("http://localhost:8081/reservation/customer-queue")
-    .then(response => response.json())
-    .then(data => {
-        if (!data || Object.keys(data).length === 0) {
-            console.warn("No reservations found.");
-            document.getElementById("reservationQueue").innerHTML = "<li>No reservations in the queue.</li>";
-            return;
+            fetch("http://localhost:8081/reservation/getReservations")
+                .then(response => response.json())
+                .then(data => {
+                    if (!data || data.length === 0) {
+                        console.warn("No reservations found.");
+                        return;
+                    }
+
+                    clearColumns();
+
+                    data.forEach(reservation => {
+                        const listItem = createReservationElement(reservation);
+                        const column = getColumnByStatus(reservation.status);
+                        column.appendChild(listItem);
+                    });
+                })
+                .catch(error => {
+                    console.error("Error fetching reservations:", error);
+                    alert("There was an error loading the reservation queue.");
+                });
         }
 
-        const queueContainer = document.getElementById("reservationQueue");
-        queueContainer.innerHTML = ""; // Clear existing content
+        function createReservationElement(reservation) {
+            const listItem = document.createElement("div");
+            listItem.classList.add("reservation");
+            listItem.dataset.id = reservation.reservationID;
+            listItem.dataset.status = reservation.status;
 
-        Object.values(data).forEach((reservation, index) => {
-            const listItem = document.createElement("li");
-            listItem.innerHTML = `#${index + 1} - Name: ${reservation.name}, Phone: ${reservation.phoneNumber}, Check-in Time: ${reservation.checkinTime}`;
-            queueContainer.appendChild(listItem);
-        });
-    })
-    .catch(error => {
-        console.error("Error fetching reservations:", error);
-        alert("There was an error loading the reservation queue.");
-    });
+            const viewLink = `<a href="${reservation.viewURL}" target="_blank">View</a>`;
+            const qrCode = reservation.qrCode ? `<div class="qr-code"><img src="data:image/png;base64,${reservation.qrCode}" alt="QR Code"></div>` : "";
 
+            listItem.innerHTML = `
+                <strong>${reservation.customerName}</strong><br>
+                Phone: ${reservation.customerPhoneNumber}<br>
+                Time: ${new Date(reservation.reservationTime).toLocaleString()}<br>
+                ${viewLink}<br>
+                ${qrCode}
+                <div class="controls">
+                    <button onclick="moveReservation('${reservation.reservationID}', -1)">←</button>
+                    <button onclick="moveReservation('${reservation.reservationID}', 1)">→</button>
+                </div>
+            `;
 
-                
+            return listItem;
         }
 
-        // Load the customer queue when the page is loaded
+        function getColumnByStatus(status) {
+            switch (status) {
+                case "inqueue":
+                    return document.getElementById("inQueue");
+                case "called":
+                    return document.getElementById("called");
+                case "seated":
+                    return document.getElementById("seated");
+                default:
+                    return document.getElementById("unknown");
+            }
+        }
+
+        function clearColumns() {
+            document.getElementById("inQueue").innerHTML = "";
+            document.getElementById("called").innerHTML = "";
+            document.getElementById("seated").innerHTML = "";
+            document.getElementById("unknown").innerHTML = "";
+        }
+
+        function moveReservation(reservationID, direction) {
+            const reservationElement = document.querySelector(`[data-id="${reservationID}"]`);
+            if (!reservationElement) return;
+
+            const statuses = ["inqueue", "called", "seated", "unknown"];
+            let currentStatus = reservationElement.dataset.status;
+            let currentIndex = statuses.indexOf(currentStatus);
+            let newIndex = currentIndex + direction;
+
+            if (newIndex >= 0 && newIndex < statuses.length) {
+                let newStatus = statuses[newIndex];
+                reservationElement.dataset.status = newStatus;
+                getColumnByStatus(newStatus).appendChild(reservationElement);
+                updateReservationStatus(reservationID, newStatus);
+            }
+        }
+
+        function updateReservationStatus(reservationID, newStatus) {
+            fetch(`http://localhost:8081/reservation/updateStatus/${reservationID}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ status: newStatus })
+            })
+            .then(response => {
+                if (!response.ok) throw new Error("Failed to update status.");
+                console.log(`Reservation ${reservationID} moved to ${newStatus}`);
+            })
+            .catch(error => console.error("Error updating reservation status:", error));
+        }
+
         window.onload = loadCustomerQueue;
     </script>
 </head>
 <body>
     <h2>Admin - Customer Reservation Queue</h2>
-    <ul id="reservationQueue">
-        <!-- Reservations will be dynamically populated here -->
-    </ul>
+    <div class="container">
+        <div class="column">
+            <h3>In Queue</h3>
+            <div id="inQueue">No reservations</div>
+        </div>
+        <div class="column">
+            <h3>Called</h3>
+            <div id="called">No reservations</div>
+        </div>
+        <div class="column">
+            <h3>Seated</h3>
+            <div id="seated">No reservations</div>
+        </div>
+        <div class="column">
+            <h3>Unknown</h3>
+            <div id="unknown">No reservations</div>
+        </div>
+    </div>
 </body>
 </html>

@@ -18,6 +18,13 @@ public class AdminDashboardController {
         this.reservationService = reservationService;
     }
 
+    // Route for the Log Off action
+    @RequestMapping("/dashboard")
+    public RedirectView dashboard() {
+        
+        return new RedirectView("/admin-dashboard.html"); // Redirect to dashboard page
+    }
+
 
     // Route for the Log Off action
     @RequestMapping("/logoff")
@@ -33,7 +40,7 @@ public class AdminDashboardController {
     }
 
     // Route for View Queue
-    @RequestMapping("/customer-queues")
+    @RequestMapping("/queues")
     public RedirectView viewQueue() {
         return new RedirectView("/admin-customer-queues.html"); // Redirect to the queue page
     }
