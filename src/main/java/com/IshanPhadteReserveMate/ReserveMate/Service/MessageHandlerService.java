@@ -38,17 +38,17 @@ public class MessageHandlerService {
     
 
     // Send a message to a specific client (via their uniqueID)
-    public void sendMessageToClient(String uniqueID, String message) {
-        SseEmitter emitter = clientEmitters.get(uniqueID);
-        if (emitter != null) {
-            try {
-                emitter.send(message);  // Send message to the client
-                logger.info("Message sent to client {}: {}", uniqueID, message);
-            } catch (Exception e) {
-                logger.error("Failed to send message to client {}: {}", uniqueID, e.getMessage());
-            }
-        } else {
-            logger.warn("No active client found for uniqueID: {}", uniqueID);
-        }
-    }
+    // public void sendMessageToClient(String uniqueID, String message) {
+    //     SseEmitter emitter = clientEmitters.get(uniqueID);
+    //     if (emitter != null) {
+    //         try {
+    //             emitter.send(message);  // Send message to the client
+    //             logger.info("Message sent to client {}: {}", uniqueID, message);
+    //         } catch (Exception e) {
+    //             logger.error("Failed to send message to client {}: {}", uniqueID, e.getMessage());
+    //         }
+    //     } else {
+    //         logger.warn("No active client found for uniqueID: {}", uniqueID);
+    //     }
+    // }
 }

@@ -27,7 +27,7 @@ public class MessageController {
         this.messageSenderService = messageSenderService;
     }
 
-    @GetMapping(value = "/subscribe/{uniqueID}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @GetMapping(value = "/updates/{uniqueID}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter subscribeToMessages(@PathVariable String uniqueID) {
         logger.info("Called Subscribe");
         // Register the client for updates with the uniqueID

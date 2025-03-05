@@ -5,6 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Customer Reservation Queue</title>
     <script>
+        // Send a message to the customer when their reservation is called up
+        function sendCalledUpUpdate(reservationID) {
+            fetch(`http://localhost:8081/messages/updates/${reservationID}`, {
+                method: "POST"
+            })
+            .then(response => {
+                if (response.ok) {
+                    console.log(`Message sent to reservation ${reservationID}: Your Table is Ready`);
+                } else {
+                    console.error("Failed to send update message.");
+                }
+            })
+            .catch(error => {
+                console.error("Error sending update:", error);
+            });
+        }
+
         function loadCustomerQueue() {
             fetch("http://localhost:8081/reservation/getReservations")
                 .then(response => response.json())
@@ -61,6 +78,12 @@
             })
             .then(response => {
                 if (response.ok) {
+                    document.getElementById(`status-${reservationID}`).innerText = getStatusText(newStatus);
+
+                    // If the reservation goes from "inqueue" to "called", trigger the message update
+                    if (newStatus === "called") {
+                        sendCalledUpUpdate(reservationID);
+                    }
                     loadCustomerQueue(); // Reload the queue to reflect changes
                 } else {
                     alert("Error updating reservation status.");
