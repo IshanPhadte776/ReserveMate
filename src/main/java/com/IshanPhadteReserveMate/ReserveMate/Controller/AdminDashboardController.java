@@ -6,16 +6,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.view.RedirectView;
 
-import com.IshanPhadteReserveMate.ReserveMate.Service.ReservationService;
-
 @Controller
 @RequestMapping("/admin")
 public class AdminDashboardController {
 
-    private final ReservationService reservationService;
 
-    public AdminDashboardController(ReservationService reservationService) {
-        this.reservationService = reservationService;
+    public AdminDashboardController() {
     }
 
     // Route for the Log Off action

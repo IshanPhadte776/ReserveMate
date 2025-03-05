@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,12 +25,10 @@ import com.google.zxing.WriterException;
 public class ReservationController {
 
     private final ReservationService reservationService;
-    private final JmsTemplate jmsTemplate;
     private static final Logger logger = LoggerFactory.getLogger(ReservationController.class);
 
-    public ReservationController(ReservationService reservationService,JmsTemplate jmsTemplate) {
+    public ReservationController(ReservationService reservationService) {
         this.reservationService = reservationService;
-        this.jmsTemplate = jmsTemplate;
     }
     @PostMapping("/create")
     public ResponseEntity<Map<String, String>> createReservation(@RequestBody Map<String, String> request) throws WriterException, IOException {
@@ -69,29 +66,6 @@ public class ReservationController {
         return new ResponseEntity<>(reservations, HttpStatus.OK);  // Return active reservations
     }
     
-    // @GetMapping("/customer-queue")
-    // public ResponseEntity<List<Map<String, String>>> getCustomerQueue() {
-    //     // Fetch all reservations from MongoDB
-    //     Iterable<Reservation> allReservations = reservationService.getAllReservations();
-
-    //     // Convert Iterable to List and extract relevant details (assuming 'name', 'phoneNumber', etc.)
-    //     List<Map<String, String>> reservationList = StreamSupport.stream(allReservations.spliterator(), false)
-    //             .map(reservation -> {
-    //                 Map<String, String> reservationDetails = reservation.getReservationDetails(); // Assuming reservation has a map with details
-    //                 return Map.of(
-    //                         "viewUrl", "/customerMessages.html?uniqueID=" + reservation.getUniqueID(),
-    //                         "qrCode", reservationDetails.get("qrCode"), // Assuming QR code is stored here
-    //                         "name", reservationDetails.get("name"),
-    //                         "phoneNumber", reservationDetails.get("phoneNumber"),
-    //                         "checkinTime", reservationDetails.get("checkinTime"),
-    //                         "uniqueID", reservation.getUniqueID()
-    //                 );
-    //             })
-    //             .collect(Collectors.toList());
-
-    //     return ResponseEntity.ok(reservationList);
-    // }
-
 
     // @GetMapping("/view/{id}")
     // public ResponseEntity<?> viewReservation(@PathVariable String id) {
