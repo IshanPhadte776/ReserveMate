@@ -2,6 +2,7 @@ package com.IshanPhadteReserveMate.ReserveMate.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -51,6 +52,17 @@ public class ReservationService {
 
     public List<Reservation> getAllActiveReservations() {
         return reservationRepository.findByStatusNot("left");  // Filter out "left" reservations
+    }
+
+    public boolean updateReservationStatus(String reservationID, String newStatus) {
+        Optional<Reservation> optionalReservation = reservationRepository.findById(reservationID);
+        if (optionalReservation.isPresent()) {
+            Reservation reservation = optionalReservation.get();
+            reservation.setStatus(newStatus);
+            reservationRepository.save(reservation);
+            return true;
+        }
+        return false;
     }
 
 }

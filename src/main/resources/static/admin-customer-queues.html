@@ -4,180 +4,142 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Customer Reservation Queue</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-        }
-        .container {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            padding: 20px;
-            max-width: 90%;
-            margin: auto;
-        }
-        .column {
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            padding: 15px;
-            background-color: #f9f9f9;
-            min-height: 250px;
-        }
-        .column h3 {
-            text-align: center;
-            margin-bottom: 10px;
-        }
-        .reservation {
-            border-bottom: 1px solid #ddd;
-            padding: 10px 0;
-            text-align: left;
-            position: relative;
-        }
-        .reservation:last-child {
-            border-bottom: none;
-        }
-        .reservation a {
-            text-decoration: none;
-            color: blue;
-        }
-        .qr-code img {
-            max-width: 50px;
-            display: block;
-            margin: 5px 0;
-        }
-        .controls {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 5px;
-        }
-        .controls button {
-            cursor: pointer;
-            background: none;
-            border: none;
-            font-size: 18px;
-            color: #333;
-        }
-    </style>
     <script>
         function loadCustomerQueue() {
             fetch("http://localhost:8081/reservation/getReservations")
                 .then(response => response.json())
                 .then(data => {
                     if (!data || data.length === 0) {
-                        console.warn("No reservations found.");
+                        document.getElementById("inqueue").innerHTML = "<p>No reservations in queue.</p>";
+                        document.getElementById("called").innerHTML = "<p>No reservations called.</p>";
+                        document.getElementById("seated").innerHTML = "<p>No seated reservations.</p>";
                         return;
                     }
 
-                    clearColumns();
+                    const queueContainer = {
+                        inqueue: document.getElementById("inqueue"),
+                        called: document.getElementById("called"),
+                        seated: document.getElementById("seated")
+                    };
 
-                    data.forEach(reservation => {
-                        const listItem = createReservationElement(reservation);
-                        const column = getColumnByStatus(reservation.status);
-                        column.appendChild(listItem);
+                    // Clear existing data
+                    queueContainer.inqueue.innerHTML = "";
+                    queueContainer.called.innerHTML = "";
+                    queueContainer.seated.innerHTML = "";
+
+                    data.forEach((reservation) => {
+                        const listItem = document.createElement("div");
+                        listItem.className = "reservation-item";
+                        listItem.id = `reservation-${reservation.reservationID}`;
+                        listItem.innerHTML = `
+                            <strong>${reservation.customerName}</strong><br>
+                            Phone: ${reservation.customerPhoneNumber}<br>
+                            Time: ${new Date(reservation.reservationTime).toLocaleString()}<br>
+                            Status: <span id="status-${reservation.reservationID}">${getStatusText(reservation.status)}</span><br>
+                            <button onclick="updateStatus('${reservation.reservationID}', '${getPreviousStatus(reservation.status)}')" ${reservation.status === "inqueue" ? "disabled" : ""}>⬅</button>
+                            <button onclick="updateStatus('${reservation.reservationID}', '${getNextStatus(reservation.status)}')" ${reservation.status === "seated" ? "disabled" : ""}>➡</button>
+                        `;
+
+                        if (queueContainer[reservation.status]) {
+                            queueContainer[reservation.status].appendChild(listItem);
+                        } else {
+                            console.warn(`Skipping reservation with unknown status: ${reservation.status}`, reservation);
+                        }
                     });
                 })
                 .catch(error => {
                     console.error("Error fetching reservations:", error);
-                    alert("There was an error loading the reservation queue.");
+                    alert("Error loading the reservation queue.");
                 });
         }
 
-        function createReservationElement(reservation) {
-            const listItem = document.createElement("div");
-            listItem.classList.add("reservation");
-            listItem.dataset.id = reservation.reservationID;
-            listItem.dataset.status = reservation.status;
+        function updateStatus(reservationID, newStatus) {
+            if (!newStatus) return; // Prevent updating to undefined status
 
-            const viewLink = `<a href="${reservation.viewURL}" target="_blank">View</a>`;
-            const qrCode = reservation.qrCode ? `<div class="qr-code"><img src="data:image/png;base64,${reservation.qrCode}" alt="QR Code"></div>` : "";
-
-            listItem.innerHTML = `
-                <strong>${reservation.customerName}</strong><br>
-                Phone: ${reservation.customerPhoneNumber}<br>
-                Time: ${new Date(reservation.reservationTime).toLocaleString()}<br>
-                ${viewLink}<br>
-                ${qrCode}
-                <div class="controls">
-                    <button onclick="moveReservation('${reservation.reservationID}', -1)">←</button>
-                    <button onclick="moveReservation('${reservation.reservationID}', 1)">→</button>
-                </div>
-            `;
-
-            return listItem;
-        }
-
-        function getColumnByStatus(status) {
-            switch (status) {
-                case "inqueue":
-                    return document.getElementById("inQueue");
-                case "called":
-                    return document.getElementById("called");
-                case "seated":
-                    return document.getElementById("seated");
-                default:
-                    return document.getElementById("unknown");
-            }
-        }
-
-        function clearColumns() {
-            document.getElementById("inQueue").innerHTML = "";
-            document.getElementById("called").innerHTML = "";
-            document.getElementById("seated").innerHTML = "";
-            document.getElementById("unknown").innerHTML = "";
-        }
-
-        function moveReservation(reservationID, direction) {
-            const reservationElement = document.querySelector(`[data-id="${reservationID}"]`);
-            if (!reservationElement) return;
-
-            const statuses = ["inqueue", "called", "seated", "unknown"];
-            let currentStatus = reservationElement.dataset.status;
-            let currentIndex = statuses.indexOf(currentStatus);
-            let newIndex = currentIndex + direction;
-
-            if (newIndex >= 0 && newIndex < statuses.length) {
-                let newStatus = statuses[newIndex];
-                reservationElement.dataset.status = newStatus;
-                getColumnByStatus(newStatus).appendChild(reservationElement);
-                updateReservationStatus(reservationID, newStatus);
-            }
-        }
-
-        function updateReservationStatus(reservationID, newStatus) {
-            fetch(`http://localhost:8081/reservation/updateStatus/${reservationID}`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ status: newStatus })
+            fetch(`http://localhost:8081/reservation/updateStatus/${reservationID}?status=${newStatus}`, {
+                method: "PUT"
             })
             .then(response => {
-                if (!response.ok) throw new Error("Failed to update status.");
-                console.log(`Reservation ${reservationID} moved to ${newStatus}`);
+                if (response.ok) {
+                    loadCustomerQueue(); // Reload the queue to reflect changes
+                } else {
+                    alert("Error updating reservation status.");
+                }
             })
-            .catch(error => console.error("Error updating reservation status:", error));
+            .catch(error => {
+                console.error("Error updating reservation:", error);
+            });
+        }
+
+        function getStatusText(status) {
+            switch (status) {
+                case "inqueue": return "In Queue";
+                case "called": return "Called";
+                case "seated": return "Seated";
+                default: return "Unknown";
+            }
+        }
+
+        function getPreviousStatus(status) {
+            switch (status) {
+                case "called": return "inqueue";
+                case "seated": return "called";
+                default: return null; // No left movement for "inqueue"
+            }
+        }
+
+        function getNextStatus(status) {
+            switch (status) {
+                case "inqueue": return "called";
+                case "called": return "seated";
+                default: return null; // No right movement for "seated"
+            }
         }
 
         window.onload = loadCustomerQueue;
     </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        .container {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+        .column {
+            width: 30%;
+            border: 1px solid black;
+            padding: 10px;
+            min-height: 200px;
+        }
+        .reservation-item {
+            border: 1px solid black;
+            padding: 10px;
+            margin: 10px;
+            text-align: center;
+        }
+        button {
+            margin: 5px;
+        }
+    </style>
 </head>
 <body>
     <h2>Admin - Customer Reservation Queue</h2>
+
     <div class="container">
         <div class="column">
             <h3>In Queue</h3>
-            <div id="inQueue">No reservations</div>
+            <div id="inqueue"></div>
         </div>
         <div class="column">
             <h3>Called</h3>
-            <div id="called">No reservations</div>
+            <div id="called"></div>
         </div>
         <div class="column">
             <h3>Seated</h3>
-            <div id="seated">No reservations</div>
-        </div>
-        <div class="column">
-            <h3>Unknown</h3>
-            <div id="unknown">No reservations</div>
+            <div id="seated"></div>
         </div>
     </div>
 </body>

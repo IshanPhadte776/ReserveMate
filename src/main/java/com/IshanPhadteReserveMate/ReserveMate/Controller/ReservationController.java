@@ -11,9 +11,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.IshanPhadteReserveMate.ReserveMate.Model.Reservation;
 import com.IshanPhadteReserveMate.ReserveMate.Service.ReservationService;
@@ -64,6 +67,17 @@ public class ReservationController {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);  // No reservations found
         }
         return new ResponseEntity<>(reservations, HttpStatus.OK);  // Return active reservations
+    }
+
+    @PutMapping("/updateStatus/{reservationID}")
+    public ResponseEntity<String> updateStatus(@PathVariable String reservationID, @RequestParam String status) {
+        boolean updated = reservationService.updateReservationStatus(reservationID, status);
+        
+        if (updated) {
+            return ResponseEntity.ok("Reservation status updated successfully.");
+        } else {
+            return ResponseEntity.badRequest().body("Reservation not found.");
+        }
     }
     
 
