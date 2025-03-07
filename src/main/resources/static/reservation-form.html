@@ -26,9 +26,10 @@
             const name = document.getElementById("name").value;
             const phone = document.getElementById("phone").value;
             const time = document.getElementById("time").value = formatDateTime();
+            const partySize = document.getElementById("partySize").value;
             
 
-            if (!name || !phone || !time) {
+            if (!name || !phone || !time || !partySize) {
                 alert("Please fill in all fields!");
                 return;
             }
@@ -41,7 +42,8 @@
             body: JSON.stringify({
                 name: name,
                 phoneNumber: phone,
-                checkinTime: time
+                checkinTime: time,
+                partySize: partySize
             })
         })
             .then(response => response.json())
@@ -72,6 +74,10 @@
 
     <label>Check-in Time:</label>
     <input type="text" id="time"><br><br>
+
+    <label>Party Size:</label>
+    <input type="number" id="partySize" min="1" step="1"><br><br>
+
 
     <button onclick="sendReservation()">Enter</button>
 </body>

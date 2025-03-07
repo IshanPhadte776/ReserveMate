@@ -76,11 +76,11 @@ import lombok.Data;
 public class Reservation {
     @Id
     private String reservationID;
-    
     private String customerName;
     private String customerPhoneNumber;
     private String reservationTime;
     private String qrCode;
     private String viewURL;
+    private String partySize;
     private String status;  // Possible values: "inqueue", "called", "seated", "left"
 }

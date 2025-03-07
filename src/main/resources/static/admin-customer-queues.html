@@ -51,12 +51,24 @@
                 });
         }
 
-        function openPopup(reservationID, customerName, partySize) {
-            selectedReservation = reservationID;
-            document.getElementById("popup").style.display = "block";
-            document.getElementById("popupName").innerText = customerName;
-            document.getElementById("partySize").value = partySize;
+        function openPopup(reservation) {
+            selectedReservation = reservation.reservationID; 
+            document.getElementById("popupName").innerText = reservation.customerName;
+            document.getElementById("popupPhone").innerText = reservation.customerPhoneNumber;
+            document.getElementById("popupTime").innerText = new Date(reservation.reservationTime).toLocaleString();
+            document.getElementById("popupStatus").innerText = getStatusText(reservation.status);
+
+            // Show the "Mark as Left" button only if status is "seated"
+            const markAsLeftBtn = document.getElementById("markAsLeftBtn");
+            if (reservation.status === "seated") {
+                markAsLeftBtn.style.display = "block";
+            } else {
+                markAsLeftBtn.style.display = "none";
+            }
+
+            document.getElementById("popup").style.display = "block"; // Show the popup
         }
+
 
         function closePopup() {
             document.getElementById("popup").style.display = "none";
@@ -94,6 +106,22 @@
                 })
                 .catch(error => console.error("Error updating party size:", error));
         }
+
+        function markAsLeft() {
+            if (!selectedReservation) return;
+
+            fetch(`http://localhost:8081/reservation/updateStatus/${selectedReservation}?status=left`, { method: "PUT" })
+                .then(response => {
+                    if (response.ok) {
+                        closePopup();
+                        loadCustomerQueue(); // Refresh the queue
+                    } else {
+                        alert("Error updating reservation status.");
+                    }
+                })
+                .catch(error => console.error("Error marking as left:", error));
+        }
+
 
         function updateStatus(reservationID, newStatus) {
             if (!newStatus) return;
@@ -214,6 +242,7 @@
         <p><strong>Party Size:</strong> <input type="number" id="partySize" min="1"></p>
         <button onclick="editPartySize()">Update Party Size</button>
         <button onclick="deleteReservation()">Delete Reservation</button>
+        <button id="markAsLeftBtn" style="display: none;" onclick="markAsLeft()">Mark as Left</button>
     </div>
 </body>
 </html>

@@ -73,11 +73,14 @@ public class ReservationController {
         // Create a new reservation object
         Reservation reservation = new Reservation();
         String reservationID = generateUniqueID();
+        reservation.setReservationID(reservationID); // Set reservationID
         reservation.setCustomerName(request.get("name"));
         reservation.setCustomerPhoneNumber(request.get("phoneNumber"));
         reservation.setReservationTime(request.get("checkinTime")); // Assuming reservationTime is in ISO format
         reservation.setStatus("inqueue");  // Set initial status to "in-queue"
-        reservation.setReservationID(reservationID); // Set reservationID
+        reservation.setPartySize(request.get("partySize"));
+
+        
 
         // Generate QR Code and View URL
         String reservationUrl = "http://localhost:8081/view/" + reservationID;
@@ -96,6 +99,7 @@ public class ReservationController {
                 "customerName", reservation.getCustomerName(),
                 "customerPhoneNumber", reservation.getCustomerPhoneNumber(),
                 "reservationTime", reservation.getReservationTime(),
+                "partySize", reservation.getPartySize(),
                 "qrCode", reservation.getQrCode(),
                 "viewURL", reservation.getViewURL(),
                 "status", reservation.getStatus()
@@ -115,6 +119,10 @@ public class ReservationController {
 
     @PutMapping("/updateStatus/{reservationID}")
     public ResponseEntity<String> updateStatus(@PathVariable String reservationID, @RequestParam String status) {
+        if (!List.of("inqueue", "called", "seated", "left").contains(status)) {
+            return ResponseEntity.badRequest().body("Invalid status.");
+        }
+        
         boolean updated = reservationService.updateReservationStatus(reservationID, status);
         
         if (updated) {
@@ -123,6 +131,7 @@ public class ReservationController {
             return ResponseEntity.badRequest().body("Reservation not found.");
         }
     }
+
 
     @DeleteMapping("/deleteReservation/{id}")
     public ResponseEntity<Map<String, String>> deleteReservation(@PathVariable String id) {
