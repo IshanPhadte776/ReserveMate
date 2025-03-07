@@ -76,6 +76,7 @@ import lombok.Data;
 public class Reservation {
     @Id
     private String reservationID;
+    
     private String customerName;
     private String customerPhoneNumber;
     private String reservationTime;

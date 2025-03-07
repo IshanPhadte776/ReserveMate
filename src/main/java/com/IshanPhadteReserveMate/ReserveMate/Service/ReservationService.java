@@ -65,4 +65,12 @@ public class ReservationService {
         return false;
     }
 
+    public void deleteReservationById(String id) {
+        reservationRepository.deleteById(id);
+    }
+
+    public Optional<Reservation> getReservationById(String id) {
+        return reservationRepository.findById(id);
+    }
+
 }
