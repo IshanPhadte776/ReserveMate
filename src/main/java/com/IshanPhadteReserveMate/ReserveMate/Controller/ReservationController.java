@@ -124,9 +124,11 @@ public class ReservationController {
         }
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/deleteReservation/{id}")
     public ResponseEntity<Map<String, String>> deleteReservation(@PathVariable String id) {
+        logger.info("Delete Reservation");
         Optional<Reservation> reservation = reservationService.getReservationById(id);
+        
 
         if (reservation.isEmpty()) {
             return ResponseEntity.status(404).body(Map.of("message", "Reservation not found"));

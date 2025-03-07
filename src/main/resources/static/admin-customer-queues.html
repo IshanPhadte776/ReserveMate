@@ -5,22 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Customer Reservation Queue</title>
     <script>
-        // Send a message to the customer when their reservation is called up
-        function sendCalledUpUpdate(reservationID) {
-            fetch(`http://localhost:8081/messages/updates/${reservationID}`, {
-                method: "POST"
-            })
-            .then(response => {
-                if (response.ok) {
-                    console.log(`Message sent to reservation ${reservationID}: Your Table is Ready`);
-                } else {
-                    console.error("Failed to send update message.");
-                }
-            })
-            .catch(error => {
-                console.error("Error sending update:", error);
-            });
-        }
+        let selectedReservation = null;
 
         function loadCustomerQueue() {
             fetch("http://localhost:8081/reservation/getReservations")
@@ -39,7 +24,6 @@
                         seated: document.getElementById("seated")
                     };
 
-                    // Clear existing data
                     queueContainer.inqueue.innerHTML = "";
                     queueContainer.called.innerHTML = "";
                     queueContainer.seated.innerHTML = "";
@@ -55,13 +39,10 @@
                             Status: <span id="status-${reservation.reservationID}">${getStatusText(reservation.status)}</span><br>
                             <button onclick="updateStatus('${reservation.reservationID}', '${getPreviousStatus(reservation.status)}')" ${reservation.status === "inqueue" ? "disabled" : ""}>⬅</button>
                             <button onclick="updateStatus('${reservation.reservationID}', '${getNextStatus(reservation.status)}')" ${reservation.status === "seated" ? "disabled" : ""}>➡</button>
+                            <button onclick="openPopup('${reservation.reservationID}', '${reservation.customerName}', ${reservation.partySize})">Edit</button>
                         `;
 
-                        if (queueContainer[reservation.status]) {
-                            queueContainer[reservation.status].appendChild(listItem);
-                        } else {
-                            console.warn(`Skipping reservation with unknown status: ${reservation.status}`, reservation);
-                        }
+                        queueContainer[reservation.status].appendChild(listItem);
                     });
                 })
                 .catch(error => {
@@ -70,8 +51,52 @@
                 });
         }
 
+        function openPopup(reservationID, customerName, partySize) {
+            selectedReservation = reservationID;
+            document.getElementById("popup").style.display = "block";
+            document.getElementById("popupName").innerText = customerName;
+            document.getElementById("partySize").value = partySize;
+        }
+
+        function closePopup() {
+            document.getElementById("popup").style.display = "none";
+            selectedReservation = null;
+        }
+
+        function deleteReservation() {
+            if (!selectedReservation) return;
+
+            fetch(`http://localhost:8081/reservation/deleteReservation/${selectedReservation}`, { method: "DELETE" })
+                .then(response => {
+                    if (response.ok) {
+                        closePopup();
+                        loadCustomerQueue();
+                    } else {
+                        alert("Error deleting reservation.");
+                    }
+                })
+                .catch(error => console.error("Error deleting reservation:", error));
+        }
+
+        function editPartySize() {
+            const newSize = document.getElementById("partySize").value;
+            if (!selectedReservation || !newSize) return;
+
+            fetch(`http://localhost:8081/reservation/updatePartySize/${selectedReservation}?partySize=${newSize}`, { method: "PUT" })
+                .then(response => {
+                    if (response.ok) {
+                        alert("Party size updated successfully.");
+                        closePopup();
+                        loadCustomerQueue();
+                    } else {
+                        alert("Error updating party size.");
+                    }
+                })
+                .catch(error => console.error("Error updating party size:", error));
+        }
+
         function updateStatus(reservationID, newStatus) {
-            if (!newStatus) return; // Prevent updating to undefined status
+            if (!newStatus) return;
 
             fetch(`http://localhost:8081/reservation/updateStatus/${reservationID}?status=${newStatus}`, {
                 method: "PUT"
@@ -79,12 +104,7 @@
             .then(response => {
                 if (response.ok) {
                     document.getElementById(`status-${reservationID}`).innerText = getStatusText(newStatus);
-
-                    // If the reservation goes from "inqueue" to "called", trigger the message update
-                    if (newStatus === "called") {
-                        sendCalledUpUpdate(reservationID);
-                    }
-                    loadCustomerQueue(); // Reload the queue to reflect changes
+                    loadCustomerQueue();
                 } else {
                     alert("Error updating reservation status.");
                 }
@@ -107,7 +127,7 @@
             switch (status) {
                 case "called": return "inqueue";
                 case "seated": return "called";
-                default: return null; // No left movement for "inqueue"
+                default: return null;
             }
         }
 
@@ -115,7 +135,7 @@
             switch (status) {
                 case "inqueue": return "called";
                 case "called": return "seated";
-                default: return null; // No right movement for "seated"
+                default: return null;
             }
         }
 
@@ -146,6 +166,26 @@
         button {
             margin: 5px;
         }
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border: 2px solid black;
+            z-index: 1000;
+        }
+        .popup button {
+            margin-top: 10px;
+        }
+        .popup .close {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -164,6 +204,16 @@
             <h3>Seated</h3>
             <div id="seated"></div>
         </div>
+    </div>
+
+    <!-- Popup for Reservation Actions -->
+    <div id="popup" class="popup">
+        <span class="close" onclick="closePopup()">X</span>
+        <h3>Reservation Details</h3>
+        <p><strong>Name:</strong> <span id="popupName"></span></p>
+        <p><strong>Party Size:</strong> <input type="number" id="partySize" min="1"></p>
+        <button onclick="editPartySize()">Update Party Size</button>
+        <button onclick="deleteReservation()">Delete Reservation</button>
     </div>
 </body>
 </html>
