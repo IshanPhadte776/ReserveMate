@@ -13,4 +13,6 @@ public interface ReservationRepository extends MongoRepository<Reservation, Stri
     Optional<Reservation> findByCustomerPhoneNumber(String phoneNumber);
     Optional<Reservation> findByReservationID(String reservationID);
     List<Reservation> findByStatusNot(String status);  // "left" means completed, filter out those
+    List<Reservation> findByStatus(String status); 
+
 }

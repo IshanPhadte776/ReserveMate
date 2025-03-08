@@ -117,6 +117,17 @@ public class ReservationController {
         return new ResponseEntity<>(reservations, HttpStatus.OK);  // Return active reservations
     }
 
+    @GetMapping("/getAllSeatedReservations")
+    public ResponseEntity<List<Reservation>> getAllSeatedReservations() {
+        List<Reservation> seatedReservations = reservationService.getReservationsByStatus("seated");
+
+        if (seatedReservations.isEmpty()) {
+            return ResponseEntity.noContent().build();  // 204 No Content if no seated reservations
+        }
+
+        return ResponseEntity.ok(seatedReservations);
+    }
+
     @PutMapping("/updateStatus/{reservationID}")
     public ResponseEntity<String> updateStatus(@PathVariable String reservationID, @RequestParam String status) {
         if (!List.of("inqueue", "called", "seated", "left").contains(status)) {

@@ -73,4 +73,8 @@ public class ReservationService {
         return reservationRepository.findById(id);
     }
 
+    public List<Reservation> getReservationsByStatus(String status) {
+        return reservationRepository.findByStatus("seated");  // Filter out "left" reservations
+    } 
+
 }

@@ -1,17 +1,24 @@
 package com.IshanPhadteReserveMate.ReserveMate.Controller;
 
-//mvn spring-boot:run
+import java.util.List;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.view.RedirectView;
+
+import com.IshanPhadteReserveMate.ReserveMate.Model.Reservation;
+import com.IshanPhadteReserveMate.ReserveMate.Service.ReservationService;
 
 @Controller
 @RequestMapping("/admin")
 public class AdminDashboardController {
+    ReservationService reservationService;
 
 
-    public AdminDashboardController() {
+    public AdminDashboardController(ReservationService reservationService) {
+        this.reservationService = reservationService;
     }
 
     // Route for the Log Off action
@@ -41,16 +48,11 @@ public class AdminDashboardController {
         return new RedirectView("/admin-customer-queues.html"); // Redirect to the queue page
     }
 
-    // @GetMapping("/customer-queues")
-    // public RedirectView showAdminPage(Model model) {
-    //     //model.addAttribute("reservations", reservationService.getAllActiveReservations()());
-    //     //return "admin-customer-queues";
-    //     return new RedirectView("/admin-customer-queues.html"); // Redirect to the queue page
-    // }
-
     // Route for Manage Tables
     @RequestMapping("/tables")
     public RedirectView manageTables() {
-        return new RedirectView("/tables"); // Redirect to the tables management page
+        return new RedirectView("/admin-tables.html"); // Redirect to the tables management page
     }
+
+    
 }
