@@ -53,13 +53,14 @@
     <div class="login-container">
         <h2>Admin Login</h2>
         <label for="restaurant-id">Restaurant ID:</label>
-        <input type="text" id="restaurant-id" required><br>
+        <input type="text" id="restaurant-id" value="R001" required><br>
 
         <label for="employee-id">Employee ID:</label>
-        <input type="text" id="employee-id" required><br>
+        <input type="text" id="employee-id" value="E001" required><br>
 
         <label for="password">Password:</label>
-        <input type="password" id="password" required><br>
+        <input type="password" id="password" value="password123" required><br>
+
 
         <button onclick="loginAdmin()">Login</button>
         <p id="error-message" style="color: red; display: none;">Invalid credentials. Try again.</p>
@@ -71,7 +72,7 @@
             const employeeID = document.getElementById("employee-id").value;
             const password = document.getElementById("password").value;
 
-            fetch("http://localhost:8081/admin/login", {
+            fetch("http://localhost:8081/login/admin", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ restaurantID, employeeID, password })
