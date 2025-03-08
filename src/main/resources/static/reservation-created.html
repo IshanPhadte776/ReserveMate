@@ -11,13 +11,14 @@
 
             if (reservationData) {
                 // Display reservation details
-                document.getElementById("reservationName").innerText = reservationData.name;
-                document.getElementById("reservationPhone").innerText = reservationData.phoneNumber;
-                document.getElementById("reservationCheckinTime").innerText = reservationData.checkinTime;
+                document.getElementById("reservationName").innerText = reservationData.customerName;
+                document.getElementById("reservationPhone").innerText = reservationData.customerPhoneNumber;
+                document.getElementById("reservationCheckinTime").innerText = reservationData.reservationTime;
                 document.getElementById("qrCode").src = 'data:image/png;base64,' + reservationData.qrCode;
                 document.getElementById("viewLink").dataset.uniqueId = reservationData.uniqueID; // Store uniqueID
                 
                 console.log(reservationData.uniqueID);
+                console.log(reservationData)
             } else {
                 // In case there's no data in localStorage
                 document.body.innerHTML = "<h2>Error: Reservation details not found!</h2>";
@@ -50,6 +51,10 @@
     <p><strong>Phone Number:</strong> <span id="reservationPhone"></span></p>
     <p><strong>Check-in Time:</strong> <span id="reservationCheckinTime"></span></p>
     <p><strong>QR Code:</strong> <img id="qrCode" alt="QR Code" /></p>
+
+    <form action="/admin/dashboard" method="get">
+        <button class="queue-btn" type="submit">Back to Dashboard</button>
+    </form>
     
     <button id="viewLink" onclick="fetchReservationDetails()">Click here to view your reservation details</button>
 </body>

@@ -54,6 +54,10 @@
         </tbody>
     </table>
 
+    <form action="/admin/dashboard" method="get">
+        <button class="queue-btn" type="submit">Back to Dashboard</button>
+    </form>
+
     <script>
         function loadSeatedReservations() {
             fetch("http://localhost:8081/reservation/getAllSeatedReservations")

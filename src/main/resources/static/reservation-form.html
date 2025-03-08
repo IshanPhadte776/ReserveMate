@@ -25,7 +25,7 @@
         function sendReservation() {
             const name = document.getElementById("name").value;
             const phone = document.getElementById("phone").value;
-            const time = document.getElementById("time").value = formatDateTime();
+            const time = formatDateTime();
             const partySize = document.getElementById("partySize").value;
             
 
@@ -48,8 +48,10 @@
         })
             .then(response => response.json())
             .then(data => {
+
+                console.log("Reservation created on js side:", data);
+
                 // After the reservation is created, handle the rerouting based on the response
-                console.log(data); // Check the response data
 
                 // Store the data in localStorage if needed, or just use the data directly
                 localStorage.setItem('reservationDetails', JSON.stringify(data));
@@ -72,13 +74,14 @@
     <label>Phone Number:</label>
     <input type="text" id="phone" value="123-456-7890"><br><br>
 
-    <label>Check-in Time:</label>
-    <input type="text" id="time"><br><br>
-
     <label>Party Size:</label>
     <input type="number" id="partySize" min="1" step="1"><br><br>
 
 
     <button onclick="sendReservation()">Enter</button>
+
+    <form action="/admin/dashboard" method="get">
+        <button class="queue-btn" type="submit">Back to Dashboard</button>
+    </form>
 </body>
 </html>

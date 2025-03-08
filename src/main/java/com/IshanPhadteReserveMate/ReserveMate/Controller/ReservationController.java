@@ -158,6 +158,30 @@ public class ReservationController {
 
         return ResponseEntity.ok(Map.of("message", "Reservation deleted successfully"));
     }
+
+    @GetMapping("/{reservationID}")
+    public ResponseEntity<?> getReservationByID(@PathVariable String reservationID) {
+        Reservation reservation = reservationService.getReservationByID(reservationID);
+
+        logger.info("Called API");
+
+        List<Reservation> reservations = reservationService.getAllActiveReservations();
+
+        logger.info(reservations.toString());
+
+        return ResponseEntity.ok(
+            Map.of(
+                "uniqueID", reservation.getReservationID(),
+                "customerName", reservation.getCustomerName(),
+                "customerPhoneNumber", reservation.getCustomerPhoneNumber(),
+                "reservationTime", reservation.getReservationTime(),
+                "partySize", reservation.getPartySize(),
+                "qrCode", reservation.getQrCode(),
+                "viewURL", reservation.getViewURL(),
+                "status", reservation.getStatus()
+            )
+        );
+    }
     
 
     // @GetMapping("/view/{id}")

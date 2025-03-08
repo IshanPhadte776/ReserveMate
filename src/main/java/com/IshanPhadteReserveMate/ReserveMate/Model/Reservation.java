@@ -66,7 +66,6 @@ package com.IshanPhadteReserveMate.ReserveMate.Model;
 //     }
 // }
 
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import lombok.Data;
@@ -74,7 +73,6 @@ import lombok.Data;
 @Document(collection = "Reservation")
 @Data  // Lombok annotation for generating getters, setters, toString, etc.
 public class Reservation {
-    @Id
     private String reservationID;
     private String customerName;
     private String customerPhoneNumber;
