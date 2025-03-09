@@ -3,15 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Reserve Mate Animation</title>
+  <title>ReserveMate - Smart Reservations</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --primary-color: #05668D;
       --accent-color: #028090;
-      --secondary-accent: #00A896;
-      --bg-color: #F0F3BD;
+      --secondary-color: #00A896;
+      --highlight-color: #02C39A;
+      --bg-color: #F7F9FC;
+      --text-color: #2d3436;
       --shadow-color: rgba(0, 0, 0, 0.08);
     }
 
@@ -19,25 +21,35 @@
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      font-family: 'Montserrat', sans-serif;
     }
 
     body {
+      color: var(--text-color);
+      overflow-x: hidden;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Animation Section */
+    .animation-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
       height: 100vh;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ed 100%);
       display: flex;
       justify-content: center;
       align-items: center;
-      background: var(--bg-color);
-      font-family: 'Montserrat', sans-serif;
-      overflow: hidden;
-      background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ed 100%);
-      -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
+      z-index: 2000;
+      transition: opacity 0.5s ease-out;
     }
 
     .container {
       position: relative;
       width: 100%;
       height: 120px;
-      padding: 0 20px; /* Add padding for smaller screens */
+      padding: 0 20px;
     }
 
     .arrow-wrapper {
@@ -47,15 +59,15 @@
       opacity: 0;
       transform: translateX(-100vw);
       animation: moveElements 6.5s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
-      max-width: 100%; /* Ensure it fits within container */
+      max-width: 100%;
     }
 
     .arrow {
-      font-size: clamp(1.5rem, 4vw, 2rem); /* Responsive font size */
+      font-size: clamp(1.5rem, 4vw, 2rem);
       color: var(--primary-color);
       background: white;
-      width: clamp(45px, 10vw, 60px); /* Responsive width */
-      height: clamp(45px, 10vw, 60px); /* Responsive height */
+      width: clamp(45px, 10vw, 60px);
+      height: clamp(45px, 10vw, 60px);
       border-radius: 50%;
       display: flex;
       justify-content: center;
@@ -63,15 +75,15 @@
       box-shadow: 0 8px 25px var(--shadow-color);
       animation: pulseArrow 2s ease-in-out infinite;
       cursor: pointer;
-      user-select: none; /* Prevent text selection */
-      touch-action: manipulation; /* Improve touch experience */
-      flex-shrink: 0; /* Prevent shrinking on small screens */
+      user-select: none;
+      touch-action: manipulation;
+      flex-shrink: 0;
     }
     
     .brand {
       display: flex;
       flex-direction: column;
-      margin-left: clamp(10px, 3vw, 20px); /* Responsive margin */
+      margin-left: clamp(10px, 3vw, 20px);
       opacity: 0;
       transform: translateY(10px);
       animation: fadeInBrand 0.8s ease-out forwards;
@@ -79,15 +91,15 @@
     }
 
     .brand-name {
-      font-size: clamp(1.8rem, 6vw, 2.8rem); /* Responsive font size */
+      font-size: clamp(1.8rem, 6vw, 2.8rem);
       font-weight: 700;
       color: var(--text-color);
       letter-spacing: -0.5px;
-      white-space: nowrap; /* Keep on one line */
+      white-space: nowrap;
     }
     
     .brand-tagline {
-      font-size: clamp(0.8rem, 3vw, 1rem); /* Responsive font size */
+      font-size: clamp(0.8rem, 3vw, 1rem);
       font-weight: 400;
       color: var(--accent-color);
       margin-top: 5px;
@@ -100,9 +112,18 @@
       color: var(--accent-color);
     }
 
-    /* Custom cursor style when disabled */
     .no-cursor {
       caret-color: transparent;
+    }
+
+    .particle {
+      position: absolute;
+      width: clamp(4px, 1vw, 6px);
+      height: clamp(4px, 1vw, 6px);
+      border-radius: 50%;
+      background-color: var(--accent-color);
+      opacity: 0;
+      z-index: -1;
     }
 
     @keyframes moveElements {
@@ -115,11 +136,11 @@
         opacity: 1;
       }
       30% {
-        transform: translateX(calc(50% - clamp(100px, 20vw, 130px))); /* Responsive centering */
+        transform: translateX(calc(50% - clamp(100px, 20vw, 130px)));
         opacity: 1;
       }
       65% {
-        transform: translateX(calc(50% - clamp(100px, 20vw, 130px))); /* Responsive centering */
+        transform: translateX(calc(50% - clamp(100px, 20vw, 130px)));
         opacity: 1;
       }
       85% {
@@ -166,22 +187,308 @@
         box-shadow: 0 8px 25px var(--shadow-color);
       }
     }
-    
-    .particle {
-      position: absolute;
-      width: clamp(4px, 1vw, 6px); /* Responsive particle size */
-      height: clamp(4px, 1vw, 6px); /* Responsive particle size */
-      border-radius: 50%;
-      background-color: var(--accent-color);
+
+    /* Main Website Styles */
+    .main-content {
       opacity: 0;
-      z-index: -1;
+      transition: opacity 1s ease-in;
+      position: relative;
+      background: var(--bg-color);
     }
 
-    /* Mobile-specific optimizations */
-    @media (max-width: 480px) {
-      .brand-tagline {
-        width: 110%; /* Allow slight overflow for small screens */
-        font-size: 0.75rem;
+    header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 50px;
+      background: white;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+    }
+
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--primary-color);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 30px;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-color);
+      font-weight: 600;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover {
+      color: var(--accent-color);
+    }
+
+    .hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      height: 100vh;
+      padding: 100px 20px;
+    }
+
+    .hero h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      margin-bottom: 15px;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      max-width: 600px;
+      line-height: 1.6;
+      margin-bottom: 25px;
+      color: #555;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 20px;
+    }
+
+    .btn {
+      text-decoration: none;
+      font-weight: 600;
+      padding: 14px 28px;
+      border-radius: 8px;
+      transition: 0.3s ease;
+      font-size: 1rem;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-primary {
+      background: var(--highlight-color);
+      color: white;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-primary:hover {
+      background: var(--secondary-color);
+    }
+
+    .btn-outline {
+      border: 2px solid var(--primary-color);
+      color: var(--primary-color);
+    }
+
+    .btn-outline:hover {
+      background: var(--primary-color);
+      color: white;
+    }
+
+    /* Pricing section with scroll reveal */
+    .pricing {
+      padding: 80px 20px;
+      text-align: center;
+      background: white;
+      min-height: 100vh;
+      /* Hide the section initially */
+      opacity: 0;
+      transform: translateY(50px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    /* Class to show the section after scrolling */
+    .pricing.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .pricing h2 {
+      font-size: 2.5rem;
+      color: var(--primary-color);
+      margin-bottom: 20px;
+    }
+
+    .pricing-container {
+      display: flex;
+      gap: 30px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 30px;
+    }
+
+    .pricing-card {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      width: 300px;
+      transition: 0.3s ease;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.6s ease, transform 0.6s ease, box-shadow 0.3s ease, transform 0.3s ease;
+    }
+
+    .pricing-container.visible .pricing-card {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Delay the second card's animation */
+    .pricing-container.visible .pricing-card:nth-child(2) {
+      transition-delay: 0.2s;
+    }
+
+    .pricing-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .pricing-card h3 {
+      font-size: 1.6rem;
+      color: var(--accent-color);
+      margin-bottom: 10px;
+    }
+
+    .pricing-card p {
+      font-size: 1rem;
+      margin-bottom: 15px;
+      color: #555;
+    }
+
+    .pricing-card .price {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--secondary-color);
+      margin-bottom: 20px;
+    }
+
+    .btn-pricing {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      text-align: center;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: 0.3s ease;
+    }
+
+    .btn-free {
+      border: 2px solid var(--primary-color);
+      color: var(--primary-color);
+    }
+
+    .btn-free:hover {
+      background: var(--primary-color);
+      color: white;
+    }
+
+    .btn-premium {
+      background: var(--highlight-color);
+      color: white;
+      border: 2px solid var(--secondary-color);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      font-weight: 700;
+      transition: 0.3s ease;
+    }
+
+    .btn-premium:hover {
+      background: var(--secondary-color);
+      border-color: var(--highlight-color);
+      color: white;
+      transform: translateY(-5px);
+    }
+
+    .github-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 50px 0;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .github-button.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .github-button a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #333;
+      color: white;
+      text-decoration: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: 0.3s ease;
+    }
+
+    .github-button a:hover {
+      background: #555;
+    }
+
+    .github-button i {
+      font-size: 1.2rem;
+    }
+
+    /* Scroll indicator arrow */
+    .scroll-indicator {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      animation: bounceDown 2s infinite;
+      color: var(--primary-color);
+      font-size: 2rem;
+      opacity: 0.8;
+    }
+
+    @keyframes bounceDown {
+      0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0) translateX(-50%);
+      }
+      40% {
+        transform: translateY(-15px) translateX(-50%);
+      }
+      60% {
+        transform: translateY(-7px) translateX(-50%);
+      }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      header {
+        padding: 15px 20px;
+      }
+
+      .nav-links {
+        gap: 15px;
+      }
+
+      .hero h1 {
+        font-size: 2.5rem;
+      }
+
+      .hero p {
+        font-size: 1.1rem;
+      }
+
+      .pricing-container {
+        flex-direction: column;
+        align-items: center;
       }
       
       /* Adjust animation timing for mobile */
@@ -195,11 +502,11 @@
           opacity: 1;
         }
         30% {
-          transform: translateX(calc(50% - 90px)); /* Adjusted for mobile */
+          transform: translateX(calc(50% - 90px));
           opacity: 1;
         }
         65% {
-          transform: translateX(calc(50% - 90px)); /* Adjusted for mobile */
+          transform: translateX(calc(50% - 90px));
           opacity: 1;
         }
         85% {
@@ -215,41 +522,100 @@
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="arrow-wrapper">
-      <div class="arrow">
-        <i class="fas fa-long-arrow-alt-right"></i>
-      </div>
-      <div class="brand">
-        <div class="brand-name">Reserve<span class="highlight">Mate</span></div>
-        <div class="brand-tagline">For all of your Reservation Needs</div>
+  <!-- Animation Section -->
+  <div class="animation-container" id="animationContainer">
+    <div class="container">
+      <div class="arrow-wrapper">
+        <div class="arrow">
+          <i class="fas fa-long-arrow-alt-right"></i>
+        </div>
+        <div class="brand">
+          <div class="brand-name">Reserve<span class="highlight">Mate</span></div>
+          <div class="brand-tagline">For all of your Reservation Needs</div>
+        </div>
       </div>
     </div>
   </div>
 
+  <!-- Main Website Content -->
+  <div class="main-content" id="mainContent">
+    <header>
+      <div class="logo">ReserveMate</div>
+      <div class="nav-links">
+        <form action="/login/" method="GET" id="signInForm">
+          <button type="submit" id="signInButton" style="background: none; border: none; color: #007bff; cursor: pointer;">
+              Sign In
+          </button>
+        </form>
+      
+        <a href="#">Get Started</a>
+      </div>
+    </header>
+
+    <section class="hero">
+      <h1>Smart Reservations Made Easy</h1>
+      <p>Manage your reservations effortlessly with ReserveMate. Choose a plan that works for you.</p>
+      <div class="cta-buttons">
+        <a href="#" class="btn btn-primary">Get Started</a>
+        <a href="#" class="btn btn-outline">Learn More</a>
+      </div>
+      <!-- Added scroll indicator -->
+      <div class="scroll-indicator">
+        <i class="fas fa-chevron-down"></i>
+      </div>
+    </section>
+
+    <section class="pricing" id="pricingSection">
+      <h2>Pricing Plans</h2>
+      <div class="pricing-container" id="pricingContainer">
+        <div class="pricing-card">
+          <h3>Free Plan</h3>
+          <p>Perfect for individuals & small businesses.</p>
+          <p class="price">$0/month</p>
+          <a href="#" class="btn-pricing btn-free">Start Free</a>
+        </div>
+        <div class="pricing-card">
+          <h3>Premium Plan</h3>
+          <p>TBD</p>
+          <p class="price">TBD</p>
+          <a href="#" class="btn-pricing btn-premium">Upgrade Now</a>
+        </div>
+      </div>
+    </section>
+
+    <div class="github-button" id="githubButton">
+      <a href="https://github.com/IshanPhadte776/ReserveMate" target="_blank">
+        <i class="fab fa-github"></i> View on GitHub
+      </a>
+    </div>
+  </div>
+
   <script>
-    // Create particle trail effect
+    // Animation functionality
     const arrowWrapper = document.querySelector('.arrow-wrapper');
     const arrowElement = document.querySelector('.arrow');
+    const animationContainer = document.getElementById('animationContainer');
+    const mainContent = document.getElementById('mainContent');
     
-    // Use fewer particles on mobile for better performance
+    // Check if the device is mobile
     const isMobile = window.innerWidth < 768;
     const particleCount = isMobile ? 2 : 3;
     const particleInterval = isMobile ? 400 : 300;
     
+    // Create particles
     function createParticles() {
       for (let i = 0; i < particleCount; i++) {
         setTimeout(() => {
           const particle = document.createElement('div');
           particle.classList.add('particle');
           
-          // Position relative to the arrow - adjust for mobile
+          // Position relative to the arrow
           const rect = arrowWrapper.getBoundingClientRect();
           const arrowCenter = isMobile ? 25 : 30;
           particle.style.left = (rect.left + arrowCenter) + 'px';
           particle.style.top = (rect.top + arrowCenter + Math.random() * 10 - 5) + 'px';
           
-          // Animation - shorter duration on mobile for performance
+          // Animation
           const duration = isMobile ? 
             (0.6 + Math.random() * 0.3) : 
             (0.8 + Math.random() * 0.4);
@@ -259,11 +625,13 @@
             moveLeft ${duration * 1.2}s ease-out forwards
           `;
           
-          document.body.appendChild(particle);
+          animationContainer.appendChild(particle);
           
-          // Clean up - shorter timeout on mobile
+          // Clean up
           setTimeout(() => {
-            particle.remove();
+            if (particle.parentNode) {
+              particle.parentNode.removeChild(particle);
+            }
           }, isMobile ? 1500 : 2000);
         }, i * (isMobile ? 300 : 200));
       }
@@ -285,15 +653,20 @@
     `;
     document.head.appendChild(style);
     
-    // Detect orientation change and adjust
-    window.addEventListener('orientationchange', function() {
-      // Allow time for orientation to complete
+    // Transition to main content after animation completes
+    setTimeout(() => {
+      animationContainer.style.opacity = "0";
+      mainContent.style.opacity = "1";
+      
+      // Remove animation container completely after fade out
       setTimeout(() => {
-        location.reload();
-      }, 100);
-    });
+        animationContainer.style.display = "none";
+        // Enable scrolling again
+        document.body.style.overflow = "auto";
+      }, 500);
+    }, 7000); // Animation duration plus a small buffer
     
-    // Trigger particles periodically during the animation - adjust timing for mobile
+    // Trigger particles periodically during the animation
     setTimeout(() => {
       const interval = setInterval(createParticles, particleInterval);
       setTimeout(() => clearInterval(interval), isMobile ? 4000 : 4500);
@@ -335,6 +708,42 @@
         navigator.vibrate(50); // Short vibration feedback
       }
     });
+
+    // Scroll reveal functionality
+    const pricingSection = document.getElementById('pricingSection');
+    const pricingContainer = document.getElementById('pricingContainer');
+    const githubButton = document.getElementById('githubButton');
+    
+    // Function to check if element is in viewport
+    function isInViewport(element) {
+      const rect = element.getBoundingClientRect();
+      return (
+        rect.top <= (window.innerHeight || document.documentElement.clientHeight) * 0.8
+      );
+    }
+    
+    // Function to handle scroll animation
+    function handleScrollAnimation() {
+      // Check if pricing section is in viewport
+      if (isInViewport(pricingSection) && !pricingSection.classList.contains('visible')) {
+        pricingSection.classList.add('visible');
+        // Add a slight delay before showing the cards
+        setTimeout(() => {
+          pricingContainer.classList.add('visible');
+        }, 200);
+      }
+      
+      // Check if github button is in viewport
+      if (isInViewport(githubButton) && !githubButton.classList.contains('visible')) {
+        githubButton.classList.add('visible');
+      }
+    }
+    
+    // Listen for scroll events
+    window.addEventListener('scroll', handleScrollAnimation);
+    
+    // Initial check in case sections are already in viewport
+    setTimeout(handleScrollAnimation, 7500); // After main animation
   </script>
 </body>
 </html>
