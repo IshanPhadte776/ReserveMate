@@ -95,7 +95,7 @@ public class ReservationController {
         // Return the saved reservation as a Map
         return ResponseEntity.ok(
             Map.of(
-                "uniqueID", reservation.getReservationID(),
+                "reservationID", reservation.getReservationID(),
                 "customerName", reservation.getCustomerName(),
                 "customerPhoneNumber", reservation.getCustomerPhoneNumber(),
                 "reservationTime", reservation.getReservationTime(),
@@ -163,11 +163,6 @@ public class ReservationController {
     public ResponseEntity<?> getReservationByID(@PathVariable String reservationID) {
         Reservation reservation = reservationService.getReservationByID(reservationID);
 
-        logger.info("Called API");
-
-        List<Reservation> reservations = reservationService.getAllActiveReservations();
-
-        logger.info(reservations.toString());
 
         return ResponseEntity.ok(
             Map.of(

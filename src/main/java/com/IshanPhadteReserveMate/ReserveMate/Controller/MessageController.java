@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -27,15 +26,25 @@ public class MessageController {
         this.messageSenderService = messageSenderService;
     }
 
-    @GetMapping(value = "/updates/{uniqueID}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @GetMapping(value = "/subscribe/{uniqueID}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter subscribeToMessages(@PathVariable String uniqueID) {
-        logger.info("Called Subscribe");
-        // Register the client for updates with the uniqueID
-        return messageHandlerService.registerClient(uniqueID);
+        logger.info("Subscribe request received for uniqueID: {}", uniqueID);
+
+        // Register the client for updates with the uniqueID and return the SseEmitter
+        SseEmitter emitter = messageHandlerService.subscribeToLiveUpdates(uniqueID);
+
+        if (emitter == null) {
+            logger.error("Failed to subscribe client with uniqueID: {}", uniqueID);
+        } else {
+            logger.info("Successfully subscribed client with uniqueID: {}", uniqueID);
+        }
+
+        return emitter;
     }
 
 
-    @PostMapping("/updates/{reservationID}")
+
+    @GetMapping("/updates/{reservationID}")
     public void sendCalledUpUpdate(@PathVariable String reservationID) {
         messageSenderService.sendMessage(reservationID, "Your Table is Ready");
     }

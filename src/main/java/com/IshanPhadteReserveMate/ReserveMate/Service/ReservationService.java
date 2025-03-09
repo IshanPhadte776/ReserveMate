@@ -3,7 +3,6 @@ package com.IshanPhadteReserveMate.ReserveMate.Service;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
@@ -26,19 +25,19 @@ public class ReservationService {
         this.reservationRepository = reservationRepository;
     }
 
-    public Map<String,String> createReservation(Map<String,String> request) {
-        String uniqueId = UUID.randomUUID().toString();
-        request.put("uniqueID", uniqueId);
+    // public Map<String,String> createReservation(Map<String,String> request) {
+    //     String uniqueId = UUID.randomUUID().toString();
+    //     request.put("uniqueID", uniqueId);
 
-        String topicName = "updates/" + uniqueId;
-        jmsTemplate.convertAndSend(topicName, request); // Send full object instead of string
+    //     String topicName = "reservation/" + uniqueId;
+    //     jmsTemplate.convertAndSend(topicName, request); // Send full object instead of string
 
-        logger.info("Reservation created: {} -> {}", topicName, request);
+    //     logger.info("Reservation created: {} -> {}", topicName, request);
 
-        reservations.put(uniqueId, request);
+    //     reservations.put(uniqueId, request);
 
-        return request; // Return full reservation object
-    }
+    //     return request; // Return full reservation object
+    // }
 
 
     public Reservation getReservationByID(String reservationID) {

@@ -4,31 +4,397 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
+    <style>
+        :root {
+            --primary: #05668d;
+            --secondary: #028090;
+            --accent: #00a896;
+            --highlight: #02c39a;
+            --light: #f0f3bd;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            min-height: 100vh;
+            background-color: #f0f3bd;
+            overflow-x: hidden;
+        }
+        
+        /* Wave background elements */
+        .waves-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+        
+        .wave {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1200 150" xmlns="http://www.w3.org/2000/svg"><path fill="%2305668d" opacity="0.1" d="M0,0 L1200,0 C800,30 800,120 400,120 C100,120 0,90 0,90 Z" /></svg>');
+            background-size: 1200px 150px;
+            background-repeat: repeat-x;
+        }
+        
+        .wave-1 {
+            bottom: -20px;
+            opacity: 0.2;
+            animation: wave 40s linear infinite;
+        }
+        
+        .wave-2 {
+            bottom: -30px;
+            background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1200 150" xmlns="http://www.w3.org/2000/svg"><path fill="%23028090" opacity="0.1" d="M0,100 Q300,50 600,100 T1200,100 L1200,150 L0,150 Z" /></svg>');
+            opacity: 0.15;
+            animation: wave 30s linear infinite reverse;
+        }
+        
+        .wave-3 {
+            bottom: -40px;
+            background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1200 150" xmlns="http://www.w3.org/2000/svg"><path fill="%2300a896" opacity="0.1" d="M0,80 Q150,60 300,80 T600,80 T900,80 T1200,80 L1200,150 L0,150 Z" /></svg>');
+            opacity: 0.1;
+            animation: wave 25s linear infinite;
+        }
+        
+        @keyframes wave {
+            0% {
+                background-position-x: 0;
+            }
+            100% {
+                background-position-x: 1200px;
+            }
+        }
+        
+        /* Grid pattern */
+        .bg-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.02;
+            background-image: 
+                linear-gradient(var(--accent) 1px, transparent 1px),
+                linear-gradient(90deg, var(--accent) 1px, transparent 1px);
+            background-size: 20px 20px;
+            z-index: -2;
+        }
+        
+        /* Navbar */
+        .navbar {
+            background-color: var(--primary);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .logo {
+            width: 40px;
+            height: 40px;
+            background-color: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 18px;
+        }
+        
+        .brand-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background-color: var(--light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        /* Main content */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .welcome-section {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .welcome-section h1 {
+            color: var(--primary);
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .welcome-section p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+        
+        /* Dashboard grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .dashboard-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            padding: 1.5rem;
+            background-color: var(--primary);
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card-checkin .card-header {
+            background-color: var(--secondary);
+        }
+        
+        .card-queue .card-header {
+            background-color: var(--accent);
+        }
+        
+        .card-tables .card-header {
+            background-color: var(--highlight);
+        }
+        
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background-color: white;
+        }
+        
+        .card-description {
+            color: #666;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-action {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            color: #333;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+        }
+        
+        .card-action:hover {
+            background-color: var(--light);
+            border-color: var(--accent);
+        }
+        
+        .log-off-container {
+            text-align: center;
+            margin-top: 3rem;
+        }
+        
+        .log-off-btn {
+            padding: 0.75rem 1.5rem;
+            background-color: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            color: #666;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .log-off-btn:hover {
+            background-color: #fee;
+            border-color: #f88;
+            color: #d33;
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: #888;
+            font-size: 0.9rem;
+            margin-top: 2rem;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem;
+            }
+            
+            .main-container {
+                padding: 1rem;
+            }
+            
+            .welcome-section h1 {
+                font-size: 2rem;
+            }
+            
+            .dashboard-grid {
+                gap: 1rem;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>Welcome to the Admin Dashboard!</h1>
-    <p>You're successfully logged in.</p>
-
-    <div class="buttons">
+    <!-- Background elements -->
+    <div class="bg-pattern"></div>
+    <div class="waves-container">
+        <div class="wave wave-1"></div>
+        <div class="wave wave-2"></div>
+        <div class="wave wave-3"></div>
+    </div>
+    
+    <!-- Navbar -->
+    <div class="navbar">
+        <div class="brand">
+            <div class="logo">ReserveMate</div>
+            <div class="brand-name">Restaurant Admin</div>
+        </div>
+        <div class="user-info">
+            <span>Welcome, Admin</span>
+            <div class="user-avatar">A</div>
+        </div>
+    </div>
+    
+    <!-- Main Container -->
+    <div class="main-container">
+        <div class="welcome-section">
+            <h1>Welcome to the Admin Dashboard</h1>
+            <p>Manage your restaurant operations efficiently</p>
+        </div>
+        
+        <div class="dashboard-grid">
+            <!-- Check-in Card -->
+            <div class="dashboard-card card-checkin">
+                <div class="card-header">
+                    <div class="card-icon">👥</div>
+                    <div class="card-title">Check-in People</div>
+                </div>
+                <div class="card-body">
+                    <div class="card-description">
+                        Manage customer check-ins and registrations. Add new guests to the waiting list.
+                    </div>
+                    <form action="/admin/check-in" method="get">
+                        <button class="card-action" type="submit">Check-in People</button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- View Queue Card -->
+            <div class="dashboard-card card-queue">
+                <div class="card-header">
+                    <div class="card-icon">📋</div>
+                    <div class="card-title">View Queue</div>
+                </div>
+                <div class="card-body">
+                    <div class="card-description">
+                        View and manage the current waiting list. Monitor wait times and availability.
+                    </div>
+                    <form action="/admin/queues" method="get">
+                        <button class="card-action" type="submit">View Queue</button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Manage Tables Card -->
+            <div class="dashboard-card card-tables">
+                <div class="card-header">
+                    <div class="card-icon">🍽️</div>
+                    <div class="card-title">Manage Tables</div>
+                </div>
+                <div class="card-body">
+                    <div class="card-description">
+                        Update table status, assign guests to tables, and manage seating arrangements.
+                    </div>
+                    <form action="/admin/tables" method="get">
+                        <button class="card-action" type="submit">Manage Tables</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
         <!-- Log Off Button -->
-        <form action="/admin/logoff" method="get">
-            <button class="log-off-btn" type="submit">Log Off</button>
-        </form>
-
-        <!-- Check-in People Button -->
-        <form action="/admin/check-in" method="get">
-            <button class="checkin-btn" type="submit">Check-in People</button>
-        </form>
-
-        <!-- View Queue Button -->
-        <form action="/admin/queues" method="get">
-            <button class="queue-btn" type="submit">View Queue</button>
-        </form>
-
-        <!-- Manage Tables Button -->
-        <form action="/admin/tables" method="get">
-            <button class="tables-btn" type="submit">Manage Tables</button>
-        </form>
+        <div class="log-off-container">
+            <form action="/admin/logoff" method="get">
+                <button class="log-off-btn" type="submit">Log Off</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <div class="footer">
+        <p>© 2025 Ishan Systems. All rights reserved.</p>
     </div>
 </body>
 </html>

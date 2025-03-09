@@ -15,7 +15,10 @@ public class MessageSenderService {
 
     // Method to send a message to a specific customer's topic
     public void sendMessage(String customerID, String message) {
-        String destination = "updates/" + customerID;  // Customer-specific topic
+        String destination = "reservation/" + customerID;  // Customer-specific topic
+
+        System.out.println("📩 Sending message to: " + destination + " | Message: " + message);
+
         jmsTemplate.convertAndSend(destination, message);
     }
 }

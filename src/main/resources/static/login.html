@@ -5,73 +5,341 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login</title>
     <style>
+        :root {
+            --primary: #05668d;
+            --secondary: #028090;
+            --accent: #00a896;
+            --highlight: #02c39a;
+            --light: #f0f3bd;
+        }
+        
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
-            background-color: #f4f4f4;
+            background-color: #F0F3BD;
+            position: relative;
+            overflow: hidden;
         }
+        
+        /* Wave background elements */
+        .waves-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+        
+        .wave {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1200 150" xmlns="http://www.w3.org/2000/svg"><path fill="%2305668d" opacity="0.1" d="M0,0 L1200,0 C800,30 800,120 400,120 C100,120 0,90 0,90 Z" /></svg>');
+            background-size: 1200px 150px;
+            background-repeat: repeat-x;
+            opacity: 0.8;
+        }
+        
+        .wave-1 {
+            bottom: -20px;
+            opacity: 0.2;
+            animation: wave 40s linear infinite;
+        }
+        
+        .wave-2 {
+            bottom: -30px;
+            background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1200 150" xmlns="http://www.w3.org/2000/svg"><path fill="%23028090" opacity="0.1" d="M0,100 Q300,50 600,100 T1200,100 L1200,150 L0,150 Z" /></svg>');
+            opacity: 0.15;
+            animation: wave 30s linear infinite reverse;
+        }
+        
+        .wave-3 {
+            bottom: -40px;
+            background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1200 150" xmlns="http://www.w3.org/2000/svg"><path fill="%2300a896" opacity="0.1" d="M0,80 Q150,60 300,80 T600,80 T900,80 T1200,80 L1200,150 L0,150 Z" /></svg>');
+            opacity: 0.1;
+            animation: wave 25s linear infinite;
+        }
+        
+        .wave-4 {
+            bottom: -50px;
+            background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1200 150" xmlns="http://www.w3.org/2000/svg"><path fill="%2302c39a" opacity="0.1" d="M0,70 Q150,100 300,70 T600,70 T900,70 T1200,70 L1200,150 L0,150 Z" /></svg>');
+            opacity: 0.05;
+            animation: wave 20s linear infinite reverse;
+        }
+        
+        .wave-top {
+            top: -70px;
+            transform: rotate(180deg);
+            opacity: 0.1;
+        }
+        
+        @keyframes wave {
+            0% {
+                background-position-x: 0;
+            }
+            100% {
+                background-position-x: 1200px;
+            }
+        }
+        
+        /* Additional subtle pattern */
+        .bg-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.02;
+            background-image: 
+                linear-gradient(var(--accent) 1px, transparent 1px),
+                linear-gradient(90deg, var(--accent) 1px, transparent 1px);
+            background-size: 20px 20px;
+            z-index: -2;
+        }
+        
         .login-container {
             background-color: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            width: 360px;
+            max-width: 90%;
+            position: relative;
+            z-index: 10;
+            border: 1px solid rgba(255, 255, 255, 0.8);
         }
+        
+        .logo-area {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            width: 240px;
+            height: 60px;
+            background-color: var(--primary);
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .logo::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent 40%, rgba(255, 255, 255, 0.6) 50%, transparent 60%);
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+        }
+        
+        @keyframes shine {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            20%, 100% { transform: translateX(100%) rotate(45deg); }
+        }
+        
+        .logo-inner {
+            width: 220px;
+            height: 40px;
+            background-color: white;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 20px;
+            z-index: 1;
+        }
+        
         h2 {
-            margin-bottom: 20px;
+            color: var(--primary);
+            margin: 0 0 10px 0;
+            font-weight: 600;
         }
+        
+        .subtitle {
+            color: #888;
+            margin: 0;
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 24px;
+        }
+        
         label {
             display: block;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+            color: #555;
+            font-size: 14px;
+            font-weight: 500;
         }
+        
         input[type="text"], input[type="password"] {
             width: 100%;
-            padding: 8px;
-            margin-bottom: 20px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
+            padding: 12px;
+            box-sizing: border-box;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            transition: all 0.3s;
+            font-size: 15px;
         }
+        
+        input[type="text"]:focus, input[type="password"]:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(0, 168, 150, 0.2);
+        }
+        
         button {
             width: 100%;
-            padding: 10px;
-            background-color: #4CAF50;
+            padding: 14px;
+            background-color: var(--primary);
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s;
+            margin-top: 10px;
+            position: relative;
+            overflow: hidden;
         }
+        
+        button::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transform: translateX(-100%);
+        }
+        
         button:hover {
-            background-color: #45a049;
+            background-color: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(5, 102, 141, 0.2);
+        }
+        
+        button:hover::after {
+            transform: translateX(100%);
+            transition: transform 0.8s ease;
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .error-message {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 20px;
+            text-align: center;
+            display: none;
+        }
+        
+        .form-footer {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 14px;
+            color: #888;
+        }
+        
+        .form-footer a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .form-footer a:hover {
+            color: var(--highlight);
+            text-decoration: underline;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        
+        .shake {
+            animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
         }
     </style>
 </head>
 <body>
-
-    <div class="login-container">
-        <h2>Admin Login</h2>
-        <label for="restaurant-id">Restaurant ID:</label>
-        <input type="text" id="restaurant-id" value="R001" required><br>
-
-        <label for="employee-id">Employee ID:</label>
-        <input type="text" id="employee-id" value="E001" required><br>
-
-        <label for="password">Password:</label>
-        <input type="password" id="password" value="password123" required><br>
-
-
-        <button onclick="loginAdmin()">Login</button>
-        <p id="error-message" style="color: red; display: none;">Invalid credentials. Try again.</p>
+    <!-- Background elements -->
+    <div class="bg-pattern"></div>
+    <div class="waves-container">
+        <div class="wave wave-1"></div>
+        <div class="wave wave-2"></div>
+        <div class="wave wave-3"></div>
+        <div class="wave wave-4"></div>
+        <div class="wave wave-1 wave-top"></div>
     </div>
-
+    
+    <div class="login-container">
+        <div class="logo-area">
+            <div class="logo">
+                <div class="logo-inner">ReserveMate</div>
+            </div>
+            <h2>Admin Login</h2>
+            <p class="subtitle">Enter your credentials to continue</p>
+        </div>
+        
+        <div class="form-group">
+            <label for="restaurant-id">Restaurant ID</label>
+            <input type="text" id="restaurant-id" value="R001" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="employee-id">Employee ID</label>
+            <input type="text" id="employee-id" value="E001" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" value="password123" required>
+        </div>
+        
+        <button onclick="loginAdmin()">Login</button>
+        <p id="error-message" class="error-message">Invalid credentials. Please try again.</p>
+        
+        <div class="form-footer">
+            <a href="#">Forgot password?</a> • <a href="#">Need help?</a>
+        </div>
+    </div>
+    
     <script>
         function loginAdmin() {
             const restaurantID = document.getElementById("restaurant-id").value;
             const employeeID = document.getElementById("employee-id").value;
             const password = document.getElementById("password").value;
-
+            
+            // Show loading state on button
+            const button = document.querySelector('button');
+            const originalText = button.textContent;
+            button.textContent = 'Logging in...';
+            button.disabled = true;
+            
             fetch("http://localhost:8081/login/admin", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -84,15 +352,28 @@
                 return response.json();
             })
             .then(data => {
-                alert("Login successful!");
-                window.location.href = "/admin-dashboard.html";  // Redirect to dashboard
+                // Success notification
+                button.textContent = 'Success!';
+                button.style.backgroundColor = '#02c39a';
+                
+                setTimeout(() => {
+                    window.location.href = "/admin-dashboard.html";  // Redirect to dashboard
+                }, 800);
             })
             .catch(error => {
                 document.getElementById("error-message").style.display = "block";
                 console.error("Login error:", error);
+                
+                // Reset button
+                button.textContent = originalText;
+                button.disabled = false;
+                
+                // Shake effect for error
+                const container = document.querySelector('.login-container');
+                container.classList.add('shake');
+                setTimeout(() => container.classList.remove('shake'), 500);
             });
         }
     </script>
-
 </body>
 </html>

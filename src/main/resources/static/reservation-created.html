@@ -4,31 +4,285 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reservation Created</title>
+    <style>
+        :root {
+            /* 5-color palette */
+            --primary: #4A90E2;    /* Blue */
+            --secondary: #50E3C2;  /* Teal */
+            --accent: #F5A623;     /* Orange/Gold */
+            --background: #F8F9FA; /* Light Gray */
+            --text: #333333;       /* Dark Gray */
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+        }
+        
+        .header {
+            margin-bottom: 30px;
+        }
+        
+        h2 {
+            color: var(--primary);
+            font-size: 24px;
+            margin-bottom: 10px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        h2:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 3px;
+            background-color: var(--secondary);
+        }
+        
+        .confirmation-details {
+            background-color: rgba(74, 144, 226, 0.05);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            text-align: left;
+        }
+        
+        .detail-item {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .detail-item strong {
+            min-width: 140px;
+            color: var(--primary);
+        }
+        
+        .qr-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+        }
+        
+        #qrCode {
+            border: 2px solid var(--secondary);
+            padding: 10px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 250px;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+        
+        /* Larger QR code on desktop */
+        @media (min-width: 768px) {
+            #qrCode {
+                max-width: 280px;
+            }
+        }
+        
+        .button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 12px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px 0;
+            width: 100%;
+        }
+        
+        .button:hover {
+            background-color: #3a7bc8;
+            transform: translateY(-2px);
+        }
+        
+        .secondary-button {
+            background-color: var(--secondary);
+        }
+        
+        .accent-button {
+            background-color: var(--accent);
+        }
+        
+        .secondary-button:hover {
+            background-color: #42c9ab;
+        }
+        
+        .accent-button:hover {
+            background-color: #e0951f;
+        }
+        
+        .footer {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #777;
+        }
+        
+        /* QR Code Popup Styles */
+        .qr-popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease;
+        }
+        
+        .qr-popup-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .qr-popup-content {
+            position: relative;
+            width: 80%;
+            max-width: 500px;
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .qr-close-btn {
+            position: absolute;
+            top: -15px;
+            right: -15px;
+            width: 30px;
+            height: 30px;
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        #largeQrCode {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            margin: 0 auto;
+            display: block;
+            border: 3px solid var(--secondary);
+            border-radius: 10px;
+            padding: 15px;
+            background-color: white;
+        }
+        
+        .qr-expand-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 15px;
+            margin-top: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: auto;
+            display: inline-block;
+        }
+        
+        .qr-expand-btn:hover {
+            background-color: #3a7bc8;
+        }
+    </style>
     <script>
         window.onload = function() {
             // Retrieve reservation data from localStorage
             const reservationData = JSON.parse(localStorage.getItem('reservationDetails'));
-
+            
             if (reservationData) {
                 // Display reservation details
                 document.getElementById("reservationName").innerText = reservationData.customerName;
                 document.getElementById("reservationPhone").innerText = reservationData.customerPhoneNumber;
                 document.getElementById("reservationCheckinTime").innerText = reservationData.reservationTime;
                 document.getElementById("qrCode").src = 'data:image/png;base64,' + reservationData.qrCode;
+                document.getElementById("largeQrCode").src = 'data:image/png;base64,' + reservationData.qrCode;
                 document.getElementById("viewLink").dataset.uniqueId = reservationData.uniqueID; // Store uniqueID
                 
                 console.log(reservationData.uniqueID);
                 console.log(reservationData)
             } else {
                 // In case there's no data in localStorage
-                document.body.innerHTML = "<h2>Error: Reservation details not found!</h2>";
+                document.querySelector('.container').innerHTML = "<h2>Error: Reservation details not found!</h2>";
             }
+            
+            // QR Code popup functionality
+            const qrExpandBtn = document.getElementById('qrExpandBtn');
+            const qrPopupOverlay = document.getElementById('qrPopupOverlay');
+            const qrCloseBtn = document.getElementById('qrCloseBtn');
+            const qrCodeImg = document.getElementById('qrCode');
+            
+            qrExpandBtn.addEventListener('click', function() {
+                qrPopupOverlay.classList.add('active');
+            });
+            
+            qrCodeImg.addEventListener('click', function() {
+                qrPopupOverlay.classList.add('active');
+            });
+            
+            qrCloseBtn.addEventListener('click', function() {
+                qrPopupOverlay.classList.remove('active');
+            });
+            
+            // Close on outside click
+            qrPopupOverlay.addEventListener('click', function(e) {
+                if (e.target === qrPopupOverlay) {
+                    qrPopupOverlay.classList.remove('active');
+                }
+            });
+            
+            // Close on escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && qrPopupOverlay.classList.contains('active')) {
+                    qrPopupOverlay.classList.remove('active');
+                }
+            });
         };
-
+        
         function fetchReservationDetails() {
             const button = document.getElementById("viewLink");
             const uniqueID = button.dataset.uniqueId; // Retrieve stored uniqueID
-
+            
             fetch(`/customer/view?uniqueID=${uniqueID}`)
                 .then(response => response.json()) // Assuming the server returns JSON
                 .then(data => {
@@ -46,16 +300,49 @@
     </script>
 </head>
 <body>
-    <h2>Reservation Created</h2>
-    <p><strong>Name:</strong> <span id="reservationName"></span></p>
-    <p><strong>Phone Number:</strong> <span id="reservationPhone"></span></p>
-    <p><strong>Check-in Time:</strong> <span id="reservationCheckinTime"></span></p>
-    <p><strong>QR Code:</strong> <img id="qrCode" alt="QR Code" /></p>
-
-    <form action="/admin/dashboard" method="get">
-        <button class="queue-btn" type="submit">Back to Dashboard</button>
-    </form>
+    <div class="container">
+        <div class="header">
+            <h2>Reservation Confirmed</h2>
+            <p>Your reservation has been successfully created!</p>
+        </div>
+        
+        <div class="confirmation-details">
+            <div class="detail-item">
+                <strong>Name:</strong> 
+                <span id="reservationName"></span>
+            </div>
+            <div class="detail-item">
+                <strong>Phone Number:</strong> 
+                <span id="reservationPhone"></span>
+            </div>
+            <div class="detail-item">
+                <strong>Check-in Time:</strong> 
+                <span id="reservationCheckinTime"></span>
+            </div>
+        </div>
+        
+        <div class="qr-container">
+            <img id="qrCode" alt="QR Code" title="Click to enlarge" />
+            <button id="qrExpandBtn" class="qr-expand-btn">Enlarge QR Code</button>
+        </div>
+        
+        <button id="viewLink" onclick="fetchReservationDetails()" class="button accent-button">View Your Reservation Details</button>
+        
+        <form action="/admin/dashboard" method="get">
+            <button class="button secondary-button" type="submit">Back to Dashboard</button>
+        </form>
+        
+        <div class="footer">
+            <p>Thank you for your reservation. We look forward to serving you!</p>
+        </div>
+    </div>
     
-    <button id="viewLink" onclick="fetchReservationDetails()">Click here to view your reservation details</button>
+    <!-- QR Code Popup -->
+    <div id="qrPopupOverlay" class="qr-popup-overlay">
+        <div class="qr-popup-content">
+            <button id="qrCloseBtn" class="qr-close-btn">✕</button>
+            <img id="largeQrCode" alt="QR Code (Large)" />
+        </div>
+    </div>
 </body>
 </html>

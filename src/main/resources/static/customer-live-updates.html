@@ -24,6 +24,11 @@
         .error {
             color: red;
         }
+        #subscribedTopic {
+            font-weight: bold;
+            color: #333;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -46,6 +51,9 @@
     <div id="errorMessage" class="error" style="display: none;">
         <p>Could not connect to the live updates. Please try again later.</p>
     </div>
+
+    <!-- Display Subscribed Topic -->
+    <div id="subscribedTopic"></div>
 
     <script>
         window.onload = async function() {
@@ -72,7 +80,7 @@
                 document.getElementById("reservationPhone").innerText = reservationData.customerPhoneNumber;
                 document.getElementById("reservationCheckinTime").innerText = reservationData.reservationTime;
                 document.getElementById("qrCode").src = 'data:image/png;base64,' + reservationData.qrCode;
-                document.getElementById("viewLink").href = '/customerMessages.html?uniqueID=' + reservationData.uniqueID;
+                document.getElementById("viewLink").href = '/customerMessages.html?reservationID=' + reservationData.uniqueID;
 
                 // Subscribe to live updates
                 subscribeToLiveUpdates(reservationData.uniqueID);
@@ -82,7 +90,11 @@
         };
 
         function subscribeToLiveUpdates(uniqueID) {
-            const eventSource = new EventSource(`/messages/subscribe/${uniqueID}`);
+            const topic = `/messages/subscribe/${uniqueID}`;
+            const eventSource = new EventSource(topic);
+
+            // Display the subscribed topic on the page
+            document.getElementById("subscribedTopic").innerText = `Spring Endpoint: ${topic}`;
 
             eventSource.onmessage = function(event) {
                 const newMessage = event.data;
