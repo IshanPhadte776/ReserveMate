@@ -184,6 +184,35 @@
         }
     </style>
     <script>
+
+async function checkAuth() {
+            const response = await fetch("http://localhost:8081/auth/check", {
+                method: "GET",
+                credentials: "include",  // Ensure cookies (session) are included in the request
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            console.log("Response from the server:", response);
+
+            if (!response.ok) {
+            // If the response is not ok, redirect to login page
+            window.location.href = "/login.html";
+            } else {
+                // If the response is OK, parse and log the response data
+                const responseData = await response.json();
+                console.log("Authentication status:", responseData.message);
+
+                // Check if the response contains restaurantID and employeeID
+                if (responseData.restaurantID && responseData.employeeID) {
+                    console.log("Restaurant ID:", responseData.restaurantID);
+                    console.log("Employee ID:", responseData.employeeID);
+                }
+            }
+        }
+        checkAuth();
+        
         function formatDateTime() {
             const now = new Date();
             

@@ -31,6 +31,7 @@
         const vpnName = "default"; // Default VPN
         const userName = "default"; // Default username
         const password = ""; // Default password (empty unless set)
+        
         const topicName = "Hello/updates"; // Listening to topic `/Hello`
 
         let solaceSession = null;
@@ -42,7 +43,9 @@
                 url: solaceWebSocketURL,
                 vpnName: vpnName,
                 userName: userName,
-                password: password
+                password: password,
+                clientName: "Client-" + new Date().getTime() // Adding a unique timestamp to client name
+
             };
 
             solaceSession = solace.SolclientFactory.createSession(sessionProperties);
@@ -57,8 +60,10 @@
                 document.getElementById("errorMessage").style.display = "block";
             });
 
+
+
             solaceSession.on(solace.SessionEventCode.MESSAGE, function (message) {
-                const receivedMessage = message.getBinaryAttachment();
+                const receivedMessage = message.getText();  // Use getText() for text messages
                 console.log("📩 Message received:", receivedMessage);
                 displayMessage(receivedMessage);
             });
