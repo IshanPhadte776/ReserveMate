@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,16 +17,19 @@ import org.springframework.web.servlet.view.RedirectView;
 import com.IshanPhadteReserveMate.ReserveMate.Model.Employee;
 import com.IshanPhadteReserveMate.ReserveMate.Service.EmployeeService;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+
 @Controller
-@RequestMapping("/login")
-public class LoginController {
+@RequestMapping("/auth")
+public class AuthController {
 
     EmployeeService employeeService;
 
     private static final Logger logger = LoggerFactory.getLogger(ReservationController.class);
 
 
-    public LoginController (EmployeeService employeeService){
+    public AuthController (EmployeeService employeeService){
         this.employeeService = employeeService;
     }
 
@@ -48,28 +52,50 @@ public class LoginController {
     //     }
     // }
 
-    @PostMapping("/admin")
-    public ResponseEntity<?> loginAdmin(@RequestBody Map<String, String> request) {
-        String restaurantID = request.get("restaurantID");
-        String employeeID = request.get("employeeID");
-        String password = request.get("password");
+    @PostMapping("/login")
+    public ResponseEntity<?> loginAdmin(HttpServletRequest request, @RequestBody Map<String, String> loginRequest) {
+        String restaurantID = loginRequest.get("restaurantID");
+        String employeeID = loginRequest.get("employeeID");
+        String password = loginRequest.get("password");
 
-        logger.info("Called");
-        logger.info(restaurantID);
-        logger.info(employeeID);
-        logger.info(password);
-
+        logger.info("Login attempt for RestaurantID: " + restaurantID + ", EmployeeID: " + employeeID);
 
         Optional<Employee> employee = employeeService.getEmployeeByRestaurantIDAndEmployeeID(restaurantID, employeeID);
 
-        logger.info(employeeService.getAllEmployees().toString());
-
-        logger.info(employee.toString());
-
         if (employee.isPresent() && employee.get().getEmployeePassword().equals(password)) {
+            // Store user info in session
+            HttpSession session = request.getSession();
+            session.setAttribute("loggedInUser", employee.get());
+
+            logger.info("Login successful. Session created with ID: " + session.getId());
+
             return ResponseEntity.ok(Map.of("message", "Login successful"));
         } else {
             return ResponseEntity.status(401).body(Map.of("message", "Invalid credentials"));
         }
     }
+
+
+    @GetMapping("/logout")
+    public ResponseEntity<String> logout(HttpServletRequest request) {
+        request.getSession().invalidate();
+        return ResponseEntity.ok("Logged out");
+    }
+
+    @GetMapping("/check")
+    public ResponseEntity<Map<String, String>> checkSession(HttpServletRequest request) {
+        HttpSession session = request.getSession(false); // Do not create a new session if one doesn't exist
+
+        if (session != null && session.getAttribute("loggedInUser") != null) {
+            Employee loggedInUser = (Employee) session.getAttribute("loggedInUser");
+            return ResponseEntity.ok(Map.of(
+                "message", "User is logged in",
+                "restaurantID", loggedInUser.getRestaurantID(),
+                "employeeID", loggedInUser.getEmployeeID()
+            ));
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Not logged in"));
+        }
+    }
+
 }
