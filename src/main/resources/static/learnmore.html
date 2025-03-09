@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ReserveMate - Learn More</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #05668D;
+      --accent-color: #028090;
+      --secondary-color: #00A896;
+      --highlight-color: #02C39A;
+      --bg-color: #F7F9FC;
+      --text-color: #2d3436;
+      --shadow-color: rgba(0, 0, 0, 0.08);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    body {
+      color: var(--text-color);
+      background-color: var(--bg-color);
+      overflow-x: hidden;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Header */
+    header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 50px;
+      background: white;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+    }
+
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      text-decoration: none;
+    }
+
+    .logo span {
+      color: var(--accent-color);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 30px;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-color);
+      font-weight: 600;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover {
+      color: var(--accent-color);
+    }
+
+    .nav-links a.active {
+      color: var(--accent-color);
+      position: relative;
+    }
+
+    .nav-links a.active::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background-color: var(--accent-color);
+      border-radius: 2px;
+    }
+
+    /* Hero section */
+    .hero {
+      padding: 150px 50px 80px;
+      text-align: center;
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+      color: white;
+    }
+
+    .hero h1 {
+      font-size: 3rem;
+      margin-bottom: 20px;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      max-width: 700px;
+      margin: 0 auto 30px;
+      line-height: 1.5;
+    }
+
+    /* Main content */
+    .main-content {
+      padding: 60px 50px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section {
+      margin-bottom: 80px;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .section.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .section-title {
+      font-size: 2.2rem;
+      color: var(--primary-color);
+      margin-bottom: 20px;
+      position: relative;
+      display: inline-block;
+    }
+
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 0;
+      width: 60%;
+      height: 4px;
+      background: var(--highlight-color);
+      border-radius: 2px;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      margin-top: 40px;
+    }
+
+    .feature-card {
+      background: white;
+      border-radius: 10px;
+      padding: 30px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .feature-icon {
+      font-size: 2.5rem;
+      color: var(--accent-color);
+      margin-bottom: 15px;
+    }
+
+    .feature-title {
+      font-size: 1.4rem;
+      margin-bottom: 10px;
+      color: var(--primary-color);
+    }
+
+    .feature-description {
+      color: #555;
+      line-height: 1.6;
+    }
+
+    /* How it works section */
+    .steps-container {
+      margin-top: 40px;
+      position: relative;
+    }
+
+    .step-timeline {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 4px;
+      background: var(--secondary-color);
+      transform: translateX(-50%);
+    }
+
+    .step {
+      display: flex;
+      align-items: center;
+      margin-bottom: 60px;
+      position: relative;
+    }
+
+    .step:last-child {
+      margin-bottom: 0;
+    }
+
+    .step-number {
+      width: 50px;
+      height: 50px;
+      background: var(--highlight-color);
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: white;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1;
+      box-shadow: 0 0 0 5px white, 0 0 0 10px rgba(2, 195, 154, 0.1);
+    }
+
+    .step-content {
+      width: 45%;
+      background: white;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .step:nth-child(odd) .step-content {
+      margin-right: auto;
+      margin-left: 0;
+      text-align: right;
+    }
+
+    .step:nth-child(even) .step-content {
+      margin-left: auto;
+      margin-right: 0;
+    }
+
+    .step-title {
+      color: var(--primary-color);
+      font-size: 1.3rem;
+      margin-bottom: 10px;
+    }
+
+    .step-description {
+      color: #555;
+      line-height: 1.6;
+    }
+
+    /* FAQ section */
+    .faq-container {
+      margin-top: 40px;
+    }
+
+    .faq-item {
+      background: white;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .faq-question {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 25px;
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--primary-color);
+      transition: background-color 0.3s;
+    }
+
+    .faq-question:hover {
+      background-color: rgba(5, 102, 141, 0.05);
+    }
+
+    .faq-question i {
+      transition: transform 0.3s ease;
+    }
+
+    .faq-answer {
+      padding: 0 25px;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease, padding 0.3s ease;
+      line-height: 1.6;
+      color: #555;
+    }
+
+    .faq-item.active .faq-question {
+      background-color: rgba(5, 102, 141, 0.05);
+    }
+
+    .faq-item.active .faq-question i {
+      transform: rotate(180deg);
+    }
+
+    .faq-item.active .faq-answer {
+      max-height: 300px;
+      padding: 0 25px 20px;
+    }
+
+    /* CTA Section */
+    .cta-section {
+      background: linear-gradient(135deg, var(--accent-color) 0%, var(--highlight-color) 100%);
+      padding: 80px 50px;
+      text-align: center;
+      color: white;
+      margin-top: 40px;
+      border-radius: 15px;
+    }
+
+    .cta-title {
+      font-size: 2.2rem;
+      margin-bottom: 20px;
+    }
+
+    .cta-description {
+      font-size: 1.2rem;
+      max-width: 700px;
+      margin: 0 auto 30px;
+      line-height: 1.5;
+    }
+
+    .btn {
+      text-decoration: none;
+      font-weight: 600;
+      padding: 14px 30px;
+      border-radius: 8px;
+      transition: 0.3s ease;
+      font-size: 1rem;
+      cursor: pointer;
+      display: inline-block;
+    }
+
+    .btn-white {
+      background: white;
+      color: var(--accent-color);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-white:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 7px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Footer */
+    footer {
+      background: white;
+      padding: 60px 50px 30px;
+      text-align: center;
+      box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .footer-logo {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      margin-bottom: 20px;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin: 20px 0;
+    }
+
+    .footer-links a {
+      text-decoration: none;
+      color: var(--text-color);
+      transition: color 0.3s;
+    }
+
+    .footer-links a:hover {
+      color: var(--accent-color);
+    }
+
+    .social-links {
+      margin: 30px 0;
+    }
+
+    .social-links a {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      width: 40px;
+      height: 40px;
+      background: var(--bg-color);
+      border-radius: 50%;
+      margin: 0 10px;
+      color: var(--primary-color);
+      transition: all 0.3s ease;
+    }
+
+    .social-links a:hover {
+      background: var(--primary-color);
+      color: white;
+      transform: translateY(-3px);
+    }
+
+    .copyright {
+      color: #777;
+      margin-top: 30px;
+      font-size: 0.9rem;
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      header {
+        padding: 15px 20px;
+      }
+
+      .nav-links {
+        gap: 15px;
+      }
+
+      .hero {
+        padding: 120px 20px 60px;
+      }
+
+      .hero h1 {
+        font-size: 2.3rem;
+      }
+
+      .main-content {
+        padding: 40px 20px;
+      }
+
+      .step-timeline {
+        left: 30px;
+      }
+
+      .step {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .step-number {
+        left: 30px;
+        transform: translateX(-50%);
+      }
+
+      .step-content {
+        width: 100%;
+        margin-left: 50px !important;
+        text-align: left !important;
+      }
+
+      .cta-section {
+        padding: 60px 20px;
+        border-radius: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <a href="index.html" class="logo">Reserve<span>Mate</span></a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="#" class="active">Learn More</a>
+      <a href="#">Sign In</a>
+      <a href="#">Get Started</a>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <h1>Discover ReserveMate</h1>
+    <p>A comprehensive reservation management system designed to streamline your booking process and enhance customer experience.</p>
+  </section>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- About Section -->
+    <section class="section" id="about">
+      <h2 class="section-title">About ReserveMate</h2>
+      <p>ReserveMate is a powerful reservation management platform that helps businesses of all sizes efficiently handle bookings, manage customer relationships, and optimize their operations. Whether you're running a restaurant, salon, clinic, or any service-based business, our intuitive system simplifies the entire reservation process.</p>
+      
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-calendar-check"></i>
+          </div>
+          <h3 class="feature-title">Easy Booking</h3>
+          <p class="feature-description">Allow customers to book appointments or make reservations 24/7 through a user-friendly interface across all devices.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-bell"></i>
+          </div>
+          <h3 class="feature-title">Smart Notifications</h3>
+          <p class="feature-description">Reduce no-shows with automated reminders via website and email, keeping everyone informed about upcoming reservations.</p>
+        </div>
+        
+      </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="section" id="how-it-works">
+      <h2 class="section-title">How It Works</h2>
+      <p>Setting up and using ReserveMate is straightforward. Follow these simple steps to transform your reservation management process:</p>
+      
+      <div class="steps-container">
+        <div class="step-timeline"></div>
+        
+        <div class="step">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h3 class="step-title">Create Your Account</h3>
+            <p class="step-description">Sign up for ReserveMate and set up your business profile with all the essential details about your services.</p>
+          </div>
+        </div>
+        
+        <div class="step">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h3 class="step-title">Customize Your Settings</h3>
+            <p class="step-description">Configure your availability, business hours, services, and booking rules according to your specific requirements.</p>
+          </div>
+        </div>
+        
+        <div class="step">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h3 class="step-title">Integrate Booking Widget</h3>
+            <p class="step-description">Add the booking widget to your website or share your unique booking link with customers on social media.</p>
+          </div>
+        </div>
+        
+        <div class="step">
+          <div class="step-number">4</div>
+          <div class="step-content">
+            <h3 class="step-title">Manage Reservations</h3>
+            <p class="step-description">View and manage all your bookings through the dashboard, with real-time updates and calendar synchronization.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="section" id="faq">
+      <h2 class="section-title">Frequently Asked Questions</h2>
+      <div class="faq-container">
+        <div class="faq-item">
+          <div class="faq-question">
+            <span>Is ReserveMate suitable for my business?</span>
+            <i class="fas fa-chevron-down"></i>
+          </div>
+          <div class="faq-answer">
+            <p>ReserveMate is designed to be versatile and can be tailored to various businesses including restaurants, salons, spas, medical clinics, fitness studios, educational institutions, and more. If your business relies on appointments or reservations, ReserveMate can help streamline your operations.</p>
+          </div>
+        </div>
+        
+        <div class="faq-item">
+          <div class="faq-question">
+            <span>How does the pricing work?</span>
+            <i class="fas fa-chevron-down"></i>
+          </div>
+          <div class="faq-answer">
+            <p>We offer a free plan for small businesses just getting started, which includes basic features. For businesses that need additional functionality, our Premium plan offers advanced features. Pricing for the Premium plan will be announced soon.</p>
+          </div>
+        </div>
+        
+        <div class="faq-item">
+          <div class="faq-question">
+            <span>Can I integrate ReserveMate with my existing systems?</span>
+            <i class="fas fa-chevron-down"></i>
+          </div>
+          <div class="faq-answer">
+            <p>Yes, ReserveMate offers integration capabilities with popular calendar systems (Google Calendar, Outlook), payment processors, and CRM systems. Our API also allows for custom integrations with your existing software infrastructure.</p>
+          </div>
+        </div>
+        
+        <div class="faq-item">
+          <div class="faq-question">
+            <span>Is there a mobile app available?</span>
+            <i class="fas fa-chevron-down"></i>
+          </div>
+          <div class="faq-answer">
+            <p>ReserveMate is fully responsive and works on all devices. We're currently developing dedicated mobile apps for iOS and Android to provide an even more streamlined experience for businesses on the go.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+      <h2 class="cta-title">Ready to Transform Your Booking Process?</h2>
+      <p class="cta-description">Join thousands of businesses that trust ReserveMate to handle their reservations.</p>
+      <a href="#" class="btn btn-white">Get Started for Free</a>
+    </section>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-logo">ReserveMate</div>
+    <div class="footer-links">
+      <a href="index.html">Home</a>
+      <a href="#">Features</a>
+      <a href="#">Pricing</a>
+      <a href="#">Contact</a>
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+    </div>
+    <div class="social-links">
+      <a href="#"><i class="fab fa-facebook-f"></i></a>
+      <a href="#"><i class="fab fa-twitter"></i></a>
+      <a href="#"><i class="fab fa-instagram"></i></a>
+      <a href="#"><i class="fab fa-linkedin-in"></i></a>
+      <a href="https://github.com/IshanPhadte776/ReserveMate" target="_blank"><i class="fab fa-github"></i></a>
+    </div>
+    <div class="copyright">&copy; 2025 ReserveMate. All rights reserved.</div>
+  </footer>
+
+  <script>
+    // FAQ accordion functionality
+    const faqItems = document.querySelectorAll('.faq-item');
+    
+    faqItems.forEach(item => {
+      const question = item.querySelector('.faq-question');
+      
+      question.addEventListener('click', () => {
+        item.classList.toggle('active');
+      });
+    });
+    
+    // Scroll reveal animation
+    function isInViewport(element) {
+      const rect = element.getBoundingClientRect();
+      return (
+        rect.top <= (window.innerHeight || document.documentElement.clientHeight) * 0.8
+      );
+    }
+    
+    function handleScrollAnimation() {
+      const sections = document.querySelectorAll('.section');
+      
+      sections.forEach(section => {
+        if (isInViewport(section) && !section.classList.contains('visible')) {
+          section.classList.add('visible');
+        }
+      });
+    }
+    
+    // Run on scroll
+    window.addEventListener('scroll', handleScrollAnimation);
+    
+    // Run on page load
+    window.addEventListener('load', () => {
+      setTimeout(handleScrollAnimation, 100);
+    });
+  </script>
+</body>
+</html>
