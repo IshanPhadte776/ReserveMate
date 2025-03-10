@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jms.core.JmsTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.IshanPhadteReserveMate.ReserveMate.Model.Reservation;
@@ -15,15 +15,14 @@ import com.IshanPhadteReserveMate.ReserveMate.Repository.ReservationRepository;
 
 @Service
 public class ReservationService {
-    private final ReservationRepository reservationRepository;
+    @Autowired
+    private ReservationRepository reservationRepository;
     private final Map<String, Map<String,String>> reservations = new ConcurrentHashMap<>();
-    private final JmsTemplate jmsTemplate;
     private static final Logger logger = LoggerFactory.getLogger(ReservationService.class);
 
-    public ReservationService(JmsTemplate jmsTemplate, ReservationRepository reservationRepository) {
-        this.jmsTemplate = jmsTemplate;
-        this.reservationRepository = reservationRepository;
-    }
+    // public ReservationService(ReservationRepository reservationRepository) {
+    //     this.reservationRepository = reservationRepository;
+    // }
 
     // public Map<String,String> createReservation(Map<String,String> request) {
     //     String uniqueId = UUID.randomUUID().toString();
