@@ -99,7 +99,9 @@ public class AuthController {
                 "message", "User is logged in",
                 "restaurantID", loggedInUser.getRestaurantID(),
                 "employeeID", loggedInUser.getEmployeeID(),
-                "employeeName", loggedInUser.getEmployeeName()
+                "employeeName", loggedInUser.getEmployeeName(),
+                "restaurantName", loggedInRestaurant.getRestaurantName(),
+                "tableCount", String.valueOf(loggedInRestaurant.getTableCount())
             ));
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Not logged in"));
