@@ -7,18 +7,23 @@
     <link rel="icon" href="http://localhost:8081/favicon.ico" type="image/x-icon">
     <style>
         :root {
-            /* Color Palette */
-            --primary: #4A90E2;    /* Blue */
-            --secondary: #50E3C2;  /* Teal */
-            --accent: #F5A623;     /* Orange/Gold */
-            --background: #F0F3BD; /* Light Gray */
-            --text: #333333;       /* Dark Gray */
+            /* Color Palette from coolors.co */
+            --primary: #05668D;    /* Darker Blue */
+            --secondary: #028090;  /* Blue-Green */
+            --tertiary: #00A896;   /* Teal */
+            --accent: #02C39A;     /* Mint Green */
+            --background: #F0F3BD; /* Cream */
+            --text: #05668D;       /* Using primary as text for better contrast */
+            --white: #FFFFFF;
+            --light-gray: #F5F5F5;
+            --error: #E74C3C;
         }
         
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            transition: all 0.3s ease;
         }
         
         body {
@@ -31,27 +36,34 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
         }
         
         .container {
-            background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+            background-color: var(--white);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(5, 102, 141, 0.15);
             width: 100%;
-            max-width: 500px;
-            padding: 30px;
+            max-width: 550px;
+            padding: 40px;
+            position: relative;
+            z-index: 1;
+            border-top: 5px solid var(--accent);
         }
         
         .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 35px;
         }
         
         h2 {
             color: var(--primary);
-            font-size: 28px;
-            margin-bottom: 10px;
+            font-size: 32px;
+            margin-bottom: 12px;
+            font-weight: 700;
             position: relative;
+            display: inline-block;
             padding-bottom: 15px;
         }
         
@@ -59,37 +71,53 @@
             content: '';
             position: absolute;
             bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60px;
+            left: 0;
+            width: 100%;
             height: 3px;
-            background-color: var(--secondary);
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 3px;
+        }
+        
+        .header p {
+            color: var(--secondary);
+            font-size: 17px;
+            margin-top: 8px;
         }
         
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            position: relative;
         }
         
         label {
             display: block;
             font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--text);
+            margin-bottom: 10px;
+            color: var(--secondary);
+            font-size: 16px;
+            letter-spacing: 0.5px;
         }
         
         input {
             width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
+            padding: 15px 18px;
+            border: 2px solid #E0E0E0;
+            border-radius: 10px;
             font-size: 16px;
-            transition: border-color 0.3s, box-shadow 0.3s;
+            transition: all 0.3s ease;
+            background-color: var(--light-gray);
+            color: var(--primary);
         }
         
         input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+            border-color: var(--tertiary);
+            box-shadow: 0 0 0 4px rgba(0, 168, 150, 0.2);
             outline: none;
+            background-color: var(--white);
+        }
+        
+        input::placeholder {
+            color: #9E9E9E;
         }
         
         input[type="number"] {
@@ -105,46 +133,54 @@
         .button-group {
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            margin-top: 30px;
+            gap: 18px;
+            margin-top: 35px;
         }
         
         .button {
-            padding: 14px 20px;
+            padding: 16px 24px;
             border: none;
-            border-radius: 6px;
-            font-size: 16px;
+            border-radius: 10px;
+            font-size: 17px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
             text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            letter-spacing: 0.5px;
         }
         
         .primary-button {
             background-color: var(--primary);
             color: white;
+            box-shadow: 0 4px 12px rgba(5, 102, 141, 0.2);
         }
         
         .primary-button:hover {
-            background-color: #3a7bc8;
-            transform: translateY(-2px);
+            background-color: #045277;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(5, 102, 141, 0.3);
         }
         
         .secondary-button {
-            background-color: var(--secondary);
+            background-color: var(--accent);
             color: white;
+            box-shadow: 0 4px 12px rgba(2, 195, 154, 0.2);
         }
         
         .secondary-button:hover {
-            background-color: #42c9ab;
-            transform: translateY(-2px);
+            background-color: #02b085;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(2, 195, 154, 0.3);
         }
         
         .error-message {
-            color: #e74c3c;
+            color: var(--error);
             font-size: 14px;
-            margin-top: 5px;
+            margin-top: 7px;
             display: none;
+            font-weight: 500;
         }
         
         /* Responsive adjustments */
@@ -158,34 +194,69 @@
             }
         }
         
-        /* Add some decoration */
+        /* Decorative elements */
         .decoration {
             position: absolute;
-            z-index: -1;
-            opacity: 0.1;
+            border-radius: 50%;
+            opacity: 0.8;
+            z-index: 0;
         }
         
         .decoration-1 {
-            top: 10%;
-            left: 5%;
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background-color: var(--accent);
+            top: -5%;
+            left: -5%;
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, var(--tertiary), transparent 70%);
+            filter: blur(30px);
         }
         
         .decoration-2 {
-            bottom: 10%;
-            right: 5%;
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            background-color: var(--primary);
+            bottom: -5%;
+            right: -5%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, var(--accent), transparent 70%);
+            filter: blur(40px);
+        }
+        
+        .decoration-3 {
+            top: 50%;
+            right: 10%;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, var(--secondary), transparent 70%);
+            filter: blur(20px);
+        }
+        
+        /* Input icons */
+        .icon-input {
+            position: relative;
+        }
+        
+        .icon-input input {
+            padding-left: 45px;
+        }
+        
+        .input-icon {
+            position: absolute;
+            top: 50%;
+            left: 15px;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            color: var(--secondary);
+            opacity: 0.7;
+        }
+        
+        /* Custom styling for specific form fields */
+        #partySize {
+            font-weight: 600;
+            text-align: center;
         }
     </style>
     <script>
-
-async function checkAuth() {
+        async function checkAuth() {
             const response = await fetch("http://localhost:8081/auth/check", {
                 method: "GET",
                 credentials: "include",  // Ensure cookies (session) are included in the request
@@ -211,6 +282,7 @@ async function checkAuth() {
                 }
             }
         }
+        
         checkAuth();
         
         function formatDateTime() {
@@ -275,6 +347,9 @@ async function checkAuth() {
             submitButton.innerHTML = "Creating Reservation...";
             submitButton.disabled = true;
             
+            // Show loading indicator
+            submitButton.classList.add("loading");
+            
             fetch("http://localhost:8081/reservation/create", {
                 method: "POST",
                 headers: {
@@ -309,6 +384,7 @@ async function checkAuth() {
                 // Reset button
                 submitButton.innerHTML = originalText;
                 submitButton.disabled = false;
+                submitButton.classList.remove("loading");
             });
         }
         
@@ -322,6 +398,12 @@ async function checkAuth() {
                     }
                 });
             });
+            
+            // Add animation to form on load
+            setTimeout(() => {
+                document.querySelector('.container').style.opacity = "1";
+                document.querySelector('.container').style.transform = "translateY(0)";
+            }, 100);
         });
     </script>
 </head>
@@ -329,28 +411,48 @@ async function checkAuth() {
     <!-- Decorative elements -->
     <div class="decoration decoration-1"></div>
     <div class="decoration decoration-2"></div>
+    <div class="decoration decoration-3"></div>
     
-    <div class="container">
+    <div class="container" style="opacity: 0; transform: translateY(20px);">
         <div class="header">
             <h2>Make a Reservation</h2>
             <p>Enter your details to secure your table</p>
         </div>
         
         <div class="form-group">
-            <label for="name">Name</label>
-            <input type="text" id="name" value="Ishan Phadte" placeholder="Enter your full name">
+            <label for="name">Guest Name</label>
+            <div class="icon-input">
+                <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <input type="text" id="name" value="Ishan Phadte" placeholder="Enter your full name">
+            </div>
             <div id="nameError" class="error-message">Please enter your name</div>
         </div>
         
         <div class="form-group">
             <label for="phone">Phone Number</label>
-            <input type="tel" id="phone" value="123-456-7890" placeholder="Enter your phone number">
+            <div class="icon-input">
+                <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                </svg>
+                <input type="tel" id="phone" value="123-456-7890" placeholder="Enter your phone number">
+            </div>
             <div id="phoneError" class="error-message">Please enter a valid phone number</div>
         </div>
         
         <div class="form-group">
             <label for="partySize">Party Size</label>
-            <input type="number" id="partySize" min="1" step="1" placeholder="Number of guests">
+            <div class="icon-input">
+                <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+                <input type="number" id="partySize" min="1" max="20" step="1" placeholder="Number of guests">
+            </div>
             <div id="partySizeError" class="error-message">Please enter a valid party size</div>
         </div>
         
@@ -359,7 +461,6 @@ async function checkAuth() {
         <div class="button-group">
             <a href="/admin/dashboard" class="button secondary-button">Back to Dashboard</a>
             <button id="submitButton" class="button primary-button" onclick="sendReservation()">Reserve Now</button>
-            
         </div>
     </div>
 </body>

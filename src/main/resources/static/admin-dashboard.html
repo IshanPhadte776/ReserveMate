@@ -306,6 +306,12 @@
                 gap: 1rem;
             }
         }
+
+        #user-avatar {
+            user-select: none; /* Prevent text selection */
+            cursor: default; /* Change the cursor to default */
+        }
+
     </style>
 </head>
 <body>
@@ -326,15 +332,14 @@
         </div>
         <div class="user-info">
             <p> <span id="user-name"></span></p>
-            <div class="user-avatar">A</div>
+            <div id="user-avatar" class="user-avatar"></div>
         </div>
     </div>
     
     <!-- Main Container -->
     <div class="main-container">
         <div class="welcome-section">
-            <h1>Welcome to the Admin Dashboard</h1>
-            <p>Manage your restaurant operations efficiently</p>
+            <h1 id="welcome-message" class="welcome-message"></h1>
         </div>
         
         <div class="dashboard-grid">
@@ -429,6 +434,12 @@
                 }
 
                 document.getElementById("user-name").textContent = responseData.employeeName;
+
+                if (responseData.employeeName) {
+                    document.getElementById("user-avatar").textContent = responseData.employeeName.charAt(0).toUpperCase();
+                }
+
+                document.getElementById("welcome-message").textContent = `Welcome, ${responseData.employeeName}`;
             }
         }
         checkAuth();

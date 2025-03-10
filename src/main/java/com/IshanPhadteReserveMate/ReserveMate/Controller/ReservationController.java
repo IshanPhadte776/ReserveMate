@@ -130,15 +130,24 @@ public class ReservationController {
 
     @PutMapping("/updateStatus/{reservationID}")
     public ResponseEntity<String> updateStatus(@PathVariable String reservationID, @RequestParam String status) {
+
+        System.out.println("Called update status");
+
         if (!List.of("inqueue", "called", "seated", "left").contains(status)) {
+            System.out.println(" Invalid status.");
             return ResponseEntity.badRequest().body("Invalid status.");
         }
         
         boolean updated = reservationService.updateReservationStatus(reservationID, status);
+
+        System.out.println(" updated");
+
         
         if (updated) {
             return ResponseEntity.ok("Reservation status updated successfully.");
+
         } else {
+            System.out.println(" nofound");
             return ResponseEntity.badRequest().body("Reservation not found.");
         }
     }
