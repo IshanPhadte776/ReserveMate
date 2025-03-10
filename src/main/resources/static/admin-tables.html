@@ -92,6 +92,16 @@
             border-radius: 2px;
         }
         
+        .table-column {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .table-section {
+            width: 48%;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -186,21 +196,42 @@
     
     <div class="content">
         <h2>Seated Reservations</h2>
-        
-        <table>
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Phone</th>
-                    <th>Party Size</th>
-                    <th>Time</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody id="seated-list">
-                <tr><td colspan="5" class="empty-message">Loading...</td></tr>
-            </tbody>
-        </table>
+
+        <div class="table-column">
+            <div class="table-section">
+                <h3>Occupied Tables</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Phone</th>
+                            <th>Party Size</th>
+                            <th>Time</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="seated-list">
+                        <tr><td colspan="5" class="empty-message">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="table-section">
+                <h3>Empty Tables</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Table ID</th>
+                            <th>Max Size</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="empty-tables-list">
+                        <tr><td colspan="3" class="empty-message">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
         
         <form action="/admin/dashboard" method="get">
             <button class="queue-btn" type="submit">Back to Dashboard</button>
@@ -208,57 +239,149 @@
     </div>
     
     <script>
-        function loadSeatedReservations() {
-            fetch("http://localhost:8081/reservation/getAllSeatedReservations")
-                .then(response => {
-                    if (response.status === 204) {
-                        document.getElementById("seated-list").innerHTML = '<tr><td colspan="5" class="empty-message">No seated reservations.</td></tr>';
-                        return [];
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    const seatedContainer = document.getElementById("seated-list");
-                    seatedContainer.innerHTML = "";
-                    
-                    if (data.length === 0) {
-                        seatedContainer.innerHTML = '<tr><td colspan="5" class="empty-message">No seated reservations.</td></tr>';
-                        return;
-                    }
-                    
-                    data.forEach(reservation => {
-                        const row = document.createElement("tr");
-                        row.innerHTML = `
-                            <td>${reservation.customerName}</td>
-                            <td>${reservation.customerPhoneNumber}</td>
-                            <td>${reservation.partySize}</td>
-                            <td>${new Date(reservation.reservationTime).toLocaleString()}</td>
-                            <td><button class="left-btn" onclick="markAsLeft('${reservation.reservationID}')">Mark as Left</button></td>
-                        `;
-                        seatedContainer.appendChild(row);
-                    });
-                })
-                .catch(error => {
-                    console.error("Error fetching seated reservations:", error);
-                    document.getElementById("seated-list").innerHTML = '<tr><td colspan="5" class="empty-message">Error loading reservations.</td></tr>';
-                });
+
+async function checkAuth() {
+    try {
+        const response = await fetch("http://localhost:8081/auth/check", {
+            method: "GET",
+            credentials: "include",  // Ensure cookies (session) are included in the request
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (!response.ok) {
+            // Redirect to login page if authentication fails
+            window.location.href = "/login.html";
+            return null;
         }
-        
-        function markAsLeft(reservationID) {
-            fetch(`http://localhost:8081/reservation/updateStatus/${reservationID}?status=left`, {
-                method: "PUT"
-            })
-            .then(response => {
-                if (response.ok) {
-                    loadSeatedReservations();
-                } else {
-                    alert("Failed to mark as left.");
-                }
-            })
-            .catch(error => console.error("Error updating reservation:", error));
+
+        // Parse JSON response
+        const responseData = await response.json();
+        console.log("Authentication status:", responseData.message);
+
+        if (responseData.restaurantID && responseData.employeeID) {
+            console.log("Restaurant ID:", responseData.restaurantID);
+            console.log("Employee ID:", responseData.employeeID);
+            console.log("Employee Name:", responseData.employeeName);
+            console.log("Restaurant Name:", responseData.restaurantName);
+            console.log("Table Count:", responseData.tableCount);
         }
-        
-        window.onload = loadSeatedReservations;
+
+        // Update UI
+        // document.getElementById("user-name").textContent = responseData.employeeName;
+        // if (responseData.employeeName) {
+        //     document.getElementById("user-avatar").textContent = responseData.employeeName.charAt(0).toUpperCase();
+        // }
+        // document.getElementById("welcome-message").textContent = `Welcome, ${responseData.employeeName}`;
+
+        return responseData.restaurantID;
+    } catch (error) {
+        console.error("Error checking authentication:", error);
+        return null;
+    }
+}
+
+async function loadSeatedReservations(restaurantID) {
+    if (!restaurantID) {
+        console.error("No restaurant ID found. Cannot fetch reservations.");
+        return;
+    }
+
+    try {
+        const response = await fetch(`http://localhost:8081/tables/getAllTables/${restaurantID}`);
+        const seatedContainer = document.getElementById("seated-list");
+
+        if (response.status === 204) {
+            seatedContainer.innerHTML = '<tr><td colspan="5" class="empty-message">No seated reservations.</td></tr>';
+            return;
+        }
+
+        const data = await response.json();
+        seatedContainer.innerHTML = "";
+
+        if (data.length === 0) {
+            seatedContainer.innerHTML = '<tr><td colspan="5" class="empty-message">No seated reservations.</td></tr>';
+            return;
+        }
+
+        data.forEach(reservation => {
+            const row = document.createElement("tr");
+            row.innerHTML = `  
+                <td>${reservation.customerName}</td>
+                <td>${reservation.customerPhoneNumber}</td>
+                <td>${reservation.partySize}</td>
+                <td>${new Date(reservation.reservationTime).toLocaleString()}</td>
+                <td><button class="left-btn" onclick="markAsLeft('${reservation.reservationID}')">Mark as Left</button></td>
+            `;
+            seatedContainer.appendChild(row);
+        });
+    } catch (error) {
+        console.error("Error fetching seated reservations:", error);
+        document.getElementById("seated-list").innerHTML = '<tr><td colspan="5" class="empty-message">Error loading reservations.</td></tr>';
+    }
+}
+
+async function loadEmptyTables() {
+    try {
+        const response = await fetch("http://localhost:8081/table/getAllEmptyTables");
+        const emptyTablesContainer = document.getElementById("empty-tables-list");
+
+        if (response.status === 204) {
+            emptyTablesContainer.innerHTML = '<tr><td colspan="3" class="empty-message">No empty tables.</td></tr>';
+            return;
+        }
+
+        const data = await response.json();
+        emptyTablesContainer.innerHTML = "";
+
+        if (data.length === 0) {
+            emptyTablesContainer.innerHTML = '<tr><td colspan="3" class="empty-message">No empty tables.</td></tr>';
+            return;
+        }
+
+        data.forEach(table => {
+            const row = document.createElement("tr");
+            row.innerHTML = `  
+                <td>${table.tableID}</td>
+                <td>${table.maxSize}</td>
+                <td><button class="left-btn" onclick="assignTableToReservation('${table.tableID}')">Assign Table</button></td>
+            `;
+            emptyTablesContainer.appendChild(row);
+        });
+    } catch (error) {
+        console.error("Error fetching empty tables:", error);
+        document.getElementById("empty-tables-list").innerHTML = '<tr><td colspan="3" class="empty-message">Error loading tables.</td></tr>';
+    }
+}
+
+function markAsLeft(reservationID) {
+    fetch(`http://localhost:8081/reservation/updateStatus/${reservationID}?status=left`, {
+        method: "PUT"
+    })
+    .then(response => {
+        if (response.ok) {
+            loadSeatedReservations();
+        } else {
+            alert("Failed to mark as left.");
+        }
+    })
+    .catch(error => console.error("Error updating reservation:", error));
+}
+
+function assignTableToReservation(tableID) {
+    alert(`Assigning table ${tableID}`);
+}
+
+// Run the functions sequentially
+window.onload = async function () {
+    const restaurantID = await checkAuth();
+    if (restaurantID) {
+        await loadSeatedReservations(restaurantID);
+        await loadEmptyTables();
+    }
+};
+
     </script>
 </body>
 </html>
