@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.view.RedirectView;
 
 import com.IshanPhadteReserveMate.ReserveMate.Model.Employee;
+import com.IshanPhadteReserveMate.ReserveMate.Model.Restaurant;
 import com.IshanPhadteReserveMate.ReserveMate.Service.EmployeeService;
+import com.IshanPhadteReserveMate.ReserveMate.Service.RestaurantService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -25,15 +27,15 @@ import jakarta.servlet.http.HttpSession;
 public class AuthController {
 
     EmployeeService employeeService;
+    RestaurantService restaurantService;
 
     private static final Logger logger = LoggerFactory.getLogger(ReservationController.class);
 
 
-    public AuthController (EmployeeService employeeService){
+    public AuthController (EmployeeService employeeService, RestaurantService restaurantService){
         this.employeeService = employeeService;
+        this.restaurantService = restaurantService;
     }
-
-    
 
 
     @GetMapping("/")
@@ -62,10 +64,13 @@ public class AuthController {
 
         Optional<Employee> employee = employeeService.getEmployeeByRestaurantIDAndEmployeeID(restaurantID, employeeID);
 
+        Restaurant restaurant = restaurantService.getRestaurantByID(restaurantID);
+
         if (employee.isPresent() && employee.get().getEmployeePassword().equals(password)) {
             // Store user info in session
             HttpSession session = request.getSession();
             session.setAttribute("loggedInUser", employee.get());
+            session.setAttribute("loggedInRestaurant", restaurant);
 
             logger.info("Login successful. Session created with ID: " + session.getId());
 
@@ -88,6 +93,8 @@ public class AuthController {
 
         if (session != null && session.getAttribute("loggedInUser") != null) {
             Employee loggedInUser = (Employee) session.getAttribute("loggedInUser");
+            Restaurant loggedInRestaurant = (Restaurant) session.getAttribute("loggedInRestaurant");
+
             return ResponseEntity.ok(Map.of(
                 "message", "User is logged in",
                 "restaurantID", loggedInUser.getRestaurantID(),
