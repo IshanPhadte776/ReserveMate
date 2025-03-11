@@ -39,12 +39,12 @@ public class ReservationService {
     // }
 
 
-    public Reservation getReservationByID(String reservationID) {
-        return reservationRepository.findReservationByReservationID(reservationID).orElseThrow(() -> new RuntimeException("Reservation not found"));
+    public  Optional<Reservation> getReservationByID(String reservationID) {
+        return reservationRepository.findReservationByReservationID(reservationID);
     }
 
-    public Reservation getReservationByReservationID(String reservationID) {
-        return reservationRepository.findReservationByReservationID(reservationID).orElseThrow(() -> new RuntimeException("Reservation not found"));
+    public Optional<Reservation> getReservationByReservationID(String reservationID) {
+        return reservationRepository.findReservationByReservationID(reservationID);
     }
 
     public Reservation getReservationByPhoneNumber(String phoneNumber) {

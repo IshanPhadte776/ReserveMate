@@ -57,7 +57,7 @@ public class TableController {
 
         List<Table> occupiedTables = tableService.getOccupiedTablesByRestaurantID(restaurantID);
 
-        System.out.println("OccupiedTable: " + occupiedTables);
+        System.out.println("OccupiedTables: " + occupiedTables);
 
 
         if (occupiedTables.isEmpty()) {
@@ -72,6 +72,7 @@ public class TableController {
                 // Convert Table entity to key-value pairs
                 combinedData.put("tableID", table.getTableID());
                 combinedData.put("restaurantID", table.getRestaurantID());
+                combinedData.put("reservationID", table.getReservationID());
                 combinedData.put("maxSize", table.getMaxSize());
                 combinedData.put("isOccupied", table.isOccupied());
 
@@ -80,12 +81,12 @@ public class TableController {
                 System.out.println(String.valueOf(table.getMaxSize()));
                 System.out.println(String.valueOf(table.isOccupied()));
 
-                System.out.println(reservationService.getReservationById("R001"));
+                System.out.println(reservationService.getReservationByReservationID("39f25696-7e45-4187-8a70-46b6b4a59b5e"));
 
-                System.out.println(reservationService.getReservationById(table.getReservationID()));
+                System.out.println(reservationService.getReservationByReservationID(table.getReservationID()));
 
                 // Fetch Reservation details
-                reservationService.getReservationById(table.getReservationID())
+                reservationService.getReservationByReservationID(table.getReservationID())
                     .ifPresent(reservation -> {
                         combinedData.put("reservationID", reservation.getReservationID());
                         combinedData.put("customerName", reservation.getCustomerName());

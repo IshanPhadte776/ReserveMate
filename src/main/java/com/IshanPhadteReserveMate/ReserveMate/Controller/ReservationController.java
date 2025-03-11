@@ -170,22 +170,24 @@ public class ReservationController {
 
     @GetMapping("/{reservationID}")
     public ResponseEntity<?> getReservationByID(@PathVariable String reservationID) {
-        Reservation reservation = reservationService.getReservationByID(reservationID);
+        Optional<Reservation> reservationOpt = reservationService.getReservationByID(reservationID);
 
-
-        return ResponseEntity.ok(
-            Map.of(
-                "uniqueID", reservation.getReservationID(),
-                "customerName", reservation.getCustomerName(),
-                "customerPhoneNumber", reservation.getCustomerPhoneNumber(),
-                "reservationTime", reservation.getReservationTime(),
-                "partySize", reservation.getPartySize(),
-                "qrCode", reservation.getQrCode(),
-                "viewURL", reservation.getViewURL(),
-                "status", reservation.getStatus()
-            )
-        );
+        return reservationOpt.map(reservation -> ResponseEntity.ok(
+                Map.of(
+                    "uniqueID", reservation.getReservationID(),
+                    "customerName", reservation.getCustomerName(),
+                    "customerPhoneNumber", reservation.getCustomerPhoneNumber(),
+                    "reservationTime", reservation.getReservationTime(),
+                    "partySize", reservation.getPartySize(),
+                    "qrCode", reservation.getQrCode(),
+                    "viewURL", reservation.getViewURL(),
+                    "status", reservation.getStatus()
+                )
+            ))
+            .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                        .body(Map.of("error", "Reservation not found")));
     }
+
     
 
     // @GetMapping("/view/{id}")
