@@ -12,6 +12,6 @@ public class RestaurantService {
     private RestaurantRepository restaurantRepository;
 
     public Restaurant getRestaurantByID(String restaurantID) {
-        return restaurantRepository.findByRestaurantID(restaurantID).orElseThrow(() -> new RuntimeException("Restaurant not found"));
+        return restaurantRepository.findRestaurantByRestaurantID(restaurantID).orElseThrow(() -> new RuntimeException("Restaurant not found"));
     }
 }

@@ -10,11 +10,11 @@ import com.IshanPhadteReserveMate.ReserveMate.Model.Table;
 @Repository
 public interface TableRepository extends MongoRepository<Table, String> {
 
-    List<Table> findByRestaurantID(String restaurantID);
+    List<Table> findTableByRestaurantID(String restaurantID);
 
-    List<Table> findByRestaurantIDAndIsOccupied(String restaurantID, boolean isOccupied);
+    List<Table> findTableByRestaurantIDAndIsOccupied(String restaurantID, boolean isOccupied);
 
-    List<Table> findByRestaurantIDAndIsOccupiedFalse(String restaurantID);
+    List<Table> findTableByRestaurantIDAndIsOccupiedFalse(String restaurantID);
 
-    List<Table> findByRestaurantIDAndIsOccupiedTrue(String restaurantID);
+    List<Table> findTableByRestaurantIDAndIsOccupiedTrue(String restaurantID);
 }

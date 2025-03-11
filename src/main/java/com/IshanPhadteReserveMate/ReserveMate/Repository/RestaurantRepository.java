@@ -9,5 +9,5 @@ import com.IshanPhadteReserveMate.ReserveMate.Model.Restaurant;
 
 @Repository
 public interface RestaurantRepository extends MongoRepository<Restaurant, String> {
-    Optional<Restaurant> findByRestaurantID(String restaurantID);
+    Optional<Restaurant> findRestaurantByRestaurantID(String restaurantID);
 }

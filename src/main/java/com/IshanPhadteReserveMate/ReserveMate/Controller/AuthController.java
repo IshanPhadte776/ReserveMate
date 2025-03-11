@@ -26,8 +26,8 @@ import jakarta.servlet.http.HttpSession;
 @RequestMapping("/auth")
 public class AuthController {
 
-    EmployeeService employeeService;
-    RestaurantService restaurantService;
+    private final EmployeeService employeeService;
+    private final RestaurantService restaurantService;
 
     private static final Logger logger = LoggerFactory.getLogger(ReservationController.class);
 

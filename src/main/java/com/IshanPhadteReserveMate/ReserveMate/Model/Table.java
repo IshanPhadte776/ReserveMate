@@ -11,6 +11,7 @@ public class Table {
     
     private String tableID;
     private String restaurantID;
+    private String reservationID;
     private int  maxSize;
     private boolean isOccupied;
 

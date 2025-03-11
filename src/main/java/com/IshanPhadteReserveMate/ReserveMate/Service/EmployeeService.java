@@ -15,7 +15,7 @@ public class EmployeeService {
     private EmployeeRepository employeeRepository;
 
     public Employee getEmployeeByID(String employeeID) {
-        return employeeRepository.findByEmployeeID(employeeID).orElseThrow(() -> new RuntimeException("Employee not found"));
+        return employeeRepository.findEmployeeByEmployeeID(employeeID).orElseThrow(() -> new RuntimeException("Employee not found"));
     }
 
     public List<Employee> getAllEmployees() {
@@ -23,6 +23,6 @@ public class EmployeeService {
     }
 
     public Optional<Employee> getEmployeeByRestaurantIDAndEmployeeID(String restaurantID, String employeeID) {
-        return employeeRepository.findByRestaurantIDAndEmployeeID(restaurantID, employeeID);
+        return employeeRepository.findEmployeeByRestaurantIDAndEmployeeID(restaurantID, employeeID);
     }
 }

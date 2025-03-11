@@ -24,17 +24,17 @@ public class TableService {
 
     // Get all tables for a specific restaurant
     public List<Table> getTablesByRestaurantID(String restaurantID) {
-        return tableRepository.findByRestaurantID(restaurantID);
+        return tableRepository.findTableByRestaurantID(restaurantID);
     }
 
     // Get only available (empty) tables for a restaurant
     public List<Table> getAvailableTablesByRestaurantID(String restaurantID) {
-        return tableRepository.findByRestaurantIDAndIsOccupiedFalse(restaurantID);
+        return tableRepository.findTableByRestaurantIDAndIsOccupiedFalse(restaurantID);
     }
 
     // Get only occupied tables for a restaurant
     public List<Table> getOccupiedTablesByRestaurantID(String restaurantID) {
-        return tableRepository.findByRestaurantIDAndIsOccupiedTrue(restaurantID);
+        return tableRepository.findTableByRestaurantIDAndIsOccupiedTrue(restaurantID);
     }
 
     // Update table status (occupied or available)

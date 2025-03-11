@@ -289,7 +289,7 @@ async function loadSeatedReservations(restaurantID) {
     }
 
     try {
-        const response = await fetch(`http://localhost:8081/tables/getAllTables/${restaurantID}`);
+        const response = await fetch(`http://localhost:8081/tables/getOccupiedTables/${restaurantID}`);
         const seatedContainer = document.getElementById("seated-list");
 
         if (response.status === 204) {
@@ -298,6 +298,9 @@ async function loadSeatedReservations(restaurantID) {
         }
 
         const data = await response.json();
+
+        console.log(data);
+
         seatedContainer.innerHTML = "";
 
         if (data.length === 0) {
@@ -305,14 +308,14 @@ async function loadSeatedReservations(restaurantID) {
             return;
         }
 
-        data.forEach(reservation => {
+        data.forEach(table => {
             const row = document.createElement("tr");
             row.innerHTML = `  
-                <td>${reservation.customerName}</td>
-                <td>${reservation.customerPhoneNumber}</td>
-                <td>${reservation.partySize}</td>
-                <td>${new Date(reservation.reservationTime).toLocaleString()}</td>
-                <td><button class="left-btn" onclick="markAsLeft('${reservation.reservationID}')">Mark as Left</button></td>
+                <td>${table.tableID}</td>
+                <td>${table.customerPhoneNumber}</td>
+                <td>${table.maxSize}</td>
+                <td>${new Date(table.reservationTime).toLocaleString()}</td>
+                <td><button class="left-btn" onclick="markAsLeft('${table.reservationID}')">Mark as Left</button></td>
             `;
             seatedContainer.appendChild(row);
         });
@@ -322,9 +325,9 @@ async function loadSeatedReservations(restaurantID) {
     }
 }
 
-async function loadEmptyTables() {
+async function loadEmptyTables(restaurantID) {
     try {
-        const response = await fetch("http://localhost:8081/table/getAllEmptyTables");
+        const response = await fetch(`http://localhost:8081/tables/getEmptyTables/${restaurantID}`);
         const emptyTablesContainer = document.getElementById("empty-tables-list");
 
         if (response.status === 204) {
@@ -378,7 +381,7 @@ window.onload = async function () {
     const restaurantID = await checkAuth();
     if (restaurantID) {
         await loadSeatedReservations(restaurantID);
-        await loadEmptyTables();
+        await loadEmptyTables(restaurantID); // Pass restaurantID here
     }
 };
 

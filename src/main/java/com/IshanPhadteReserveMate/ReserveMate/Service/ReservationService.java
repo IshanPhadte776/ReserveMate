@@ -40,16 +40,20 @@ public class ReservationService {
 
 
     public Reservation getReservationByID(String reservationID) {
-        return reservationRepository.findByReservationID(reservationID).orElseThrow(() -> new RuntimeException("Reservation not found"));
+        return reservationRepository.findReservationByReservationID(reservationID).orElseThrow(() -> new RuntimeException("Reservation not found"));
+    }
+
+    public Reservation getReservationByReservationID(String reservationID) {
+        return reservationRepository.findReservationByReservationID(reservationID).orElseThrow(() -> new RuntimeException("Reservation not found"));
     }
 
     public Reservation getReservationByPhoneNumber(String phoneNumber) {
-        return reservationRepository.findByCustomerPhoneNumber(phoneNumber)
+        return reservationRepository.findReservationByCustomerPhoneNumber(phoneNumber)
             .orElseThrow(() -> new RuntimeException("Reservation not found with Phone Number: " + phoneNumber));
     }
 
     public List<Reservation> getAllActiveReservations() {
-        return reservationRepository.findByStatusNot("left");  // Filter out "left" reservations
+        return reservationRepository.findReservationByStatusNot("left");  // Filter out "left" reservations
     }
 
     public boolean updateReservationStatus(String reservationID, String newStatus) {
@@ -58,7 +62,7 @@ public class ReservationService {
         System.out.println(getAllActiveReservations());
 
 
-        Optional<Reservation> optionalReservation = reservationRepository.findByReservationID(reservationID);
+        Optional<Reservation> optionalReservation = reservationRepository.findReservationByReservationID(reservationID);
 
         System.out.println(optionalReservation);
         if (optionalReservation.isPresent()) {
@@ -79,7 +83,7 @@ public class ReservationService {
     }
 
     public List<Reservation> getReservationsByStatus(String status) {
-        return reservationRepository.findByStatus("seated");  // Filter out "left" reservations
+        return reservationRepository.findReservationByStatus("seated");  // Filter out "left" reservations
     } 
 
 }

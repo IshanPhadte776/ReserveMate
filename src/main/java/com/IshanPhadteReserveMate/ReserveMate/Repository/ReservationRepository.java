@@ -10,9 +10,9 @@ import com.IshanPhadteReserveMate.ReserveMate.Model.Reservation;
 
 @Repository
 public interface ReservationRepository extends MongoRepository<Reservation, String> {
-    Optional<Reservation> findByCustomerPhoneNumber(String phoneNumber);
-    Optional<Reservation> findByReservationID(String reservationID);
-    List<Reservation> findByStatusNot(String status);  // "left" means completed, filter out those
-    List<Reservation> findByStatus(String status); 
+    Optional<Reservation> findReservationByCustomerPhoneNumber(String phoneNumber);
+    Optional<Reservation> findReservationByReservationID(String reservationID);
+    List<Reservation> findReservationByStatusNot(String status);  // "left" means completed, filter out those
+    List<Reservation> findReservationByStatus(String status); 
 
 }
