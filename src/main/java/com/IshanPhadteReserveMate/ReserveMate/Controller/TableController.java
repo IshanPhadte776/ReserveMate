@@ -81,16 +81,23 @@ public class TableController {
                 System.out.println(String.valueOf(table.getMaxSize()));
                 System.out.println(String.valueOf(table.isOccupied()));
 
+
+
+
                 System.out.println(reservationService.getReservationByReservationID("39f25696-7e45-4187-8a70-46b6b4a59b5e"));
 
                 System.out.println(reservationService.getReservationByReservationID(table.getReservationID()));
 
                 // Fetch Reservation details
                 reservationService.getReservationByReservationID(table.getReservationID())
+
                     .ifPresent(reservation -> {
+                        System.out.println(reservation.getCustomerEmail());
+
                         combinedData.put("reservationID", reservation.getReservationID());
                         combinedData.put("customerName", reservation.getCustomerName());
                         combinedData.put("customerPhoneNumber", reservation.getCustomerPhoneNumber());
+                        combinedData.put("customerEmail", reservation.getCustomerEmail());
                         combinedData.put("partySize", reservation.getPartySize());
                         combinedData.put("reservationTime", reservation.getReservationTime());
                         combinedData.put("status", reservation.getStatus());
@@ -105,7 +112,7 @@ public class TableController {
 
 
     // Update table status (occupied or available)
-    @PutMapping("/{tableID}/status")
+    @PutMapping("/updateStatus/{tableID}")
     public ResponseEntity<Void> updateTableStatus(
             @PathVariable String tableID,
             @RequestParam boolean isOccupied) {

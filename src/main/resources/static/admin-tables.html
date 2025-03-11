@@ -312,7 +312,7 @@ async function loadSeatedReservations(restaurantID) {
             const row = document.createElement("tr");
             row.innerHTML = `  
                 <td>${table.tableID}</td>
-                <td>${table.customerPhoneNumber}</td>
+                <td>${table.customerName}</td>
                 <td>${table.maxSize}</td>
                 <td>${new Date(table.reservationTime).toLocaleString()}</td>
                 <td><button class="left-btn" onclick="markAsLeft('${table.reservationID}')">Mark as Left</button></td>
@@ -360,6 +360,20 @@ async function loadEmptyTables(restaurantID) {
 
 function markAsLeft(reservationID) {
     fetch(`http://localhost:8081/reservation/updateStatus/${reservationID}?status=left`, {
+        method: "PUT"
+    })
+    .then(response => {
+        if (response.ok) {
+            loadSeatedReservations();
+        } else {
+            alert("Failed to mark as left.");
+        }
+    })
+    .catch(error => console.error("Error updating reservation:", error));
+}
+
+function clearTable(tableID) {
+    fetch(`http://localhost:8081/tables/updateStatus/${tableID}?isOccupied=false`, {
         method: "PUT"
     })
     .then(response => {
