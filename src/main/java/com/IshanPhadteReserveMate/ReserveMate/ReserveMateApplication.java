@@ -1,17 +1,7 @@
 package com.IshanPhadteReserveMate.ReserveMate;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.jms.annotation.JmsListener;
-import org.springframework.messaging.Message;
-import org.springframework.messaging.MessageHeaders;
-import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @SpringBootApplication
 public class ReserveMateApplication {
@@ -48,26 +38,4 @@ public class ReserveMateApplication {
     //     }
     // }
 
-    @Component
-    static class MessageHandler {
-
-        private static final Logger logger = LoggerFactory.getLogger(MessageHandler.class);
-        private final Map<String, SseEmitter> emitters = new ConcurrentHashMap<>();
-        @JmsListener(destination = "topic/dynamic/#", containerFactory = "cFactory")
-        public void processMsg(Message<?> msg) {
-            logMessage(msg);
-        }
-
-        private void logMessage(Message<?> msg) {
-            StringBuilder msgAsStr = new StringBuilder("============= Received \nHeaders:");
-            MessageHeaders hdrs = msg.getHeaders();
-            msgAsStr.append("\nUUID: " + hdrs.getId());
-            msgAsStr.append("\nTimestamp: " + hdrs.getTimestamp());
-            for (String key : hdrs.keySet()) {
-                msgAsStr.append("\n" + key + ": " + hdrs.get(key));
-            }
-            msgAsStr.append("\nPayload: " + msg.getPayload());
-            logger.info(msgAsStr.toString());
-        }
-    }
 }

@@ -25,7 +25,7 @@
                 .then(response => response.json()) // Assuming the server returns JSON
                 .then(data => {
                     if (data) {
-                        window.location.href = `/customer-live-updates.html?uniqueID=${uniqueID}`;
+                        console.log(data)
                     } else {
                         alert("Error: Invalid response from server.");
                     }

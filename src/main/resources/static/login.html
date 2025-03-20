@@ -375,6 +375,16 @@
                 setTimeout(() => container.classList.remove('shake'), 500);
             });
         }
+
+        const urlParams = new URLSearchParams(window.location.search);
+
+        // Extract parameters like 'username' and 'message'
+        const username = urlParams.get('username');
+        const message = urlParams.get('message');
+
+        // Log the parameters to the console
+        console.log("Username:", username);
+        console.log("Message:", message);
     </script>
 </body>
 </html>
