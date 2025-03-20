@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.IshanPhadteReserveMate.ReserveMate.Model.Reservation;
 import com.IshanPhadteReserveMate.ReserveMate.Repository.ReservationRepository;
+import com.IshanPhadteReserveMate.ReserveMate.Service.MessageSenderService;
 import com.IshanPhadteReserveMate.ReserveMate.Service.ReservationService;
 import com.IshanPhadteReserveMate.ReserveMate.Utils.QRCodeGenerator;
 import com.google.zxing.WriterException;
@@ -31,12 +32,14 @@ public class ReservationController {
 
     private final ReservationService reservationService;
     private final ReservationRepository reservationRepository;
+    private final MessageSenderService messageService;
     
     private static final Logger logger = LoggerFactory.getLogger(ReservationController.class);
 
-    public ReservationController(ReservationService reservationService, ReservationRepository reservationRepository) {
+    public ReservationController(ReservationService reservationService, ReservationRepository reservationRepository, MessageSenderService messageService) {
         this.reservationService = reservationService;
         this.reservationRepository = reservationRepository;
+        this.messageService = messageService;
     }
     // @PostMapping("/create")
     // public ResponseEntity<Map<String, String>> createReservation(@RequestBody Map<String, String> request) throws WriterException, IOException {
@@ -140,7 +143,7 @@ public class ReservationController {
         
         boolean updated = reservationService.updateReservationStatus(reservationID, status);
 
-        System.out.println(" updated");
+        messageService.sendMessage(reservationID, "Update Status");
 
         
         if (updated) {

@@ -6,6 +6,8 @@
     <title>Real-time Solace Messages</title>
     <link rel="icon" href="http://localhost:8081/favicon.ico" type="image/x-icon">
     <script src="solclient.js"></script>
+    <!-- Load the Persistence with Queues - Queue Consumer  -->
+    <script src="QueueConsumer.js"></script>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
         h2 { color: #333; }
@@ -13,6 +15,53 @@
         .error { color: red; }
     </style>
 </head>
+<script>
+
+    function fetchReservationDetails() {
+        const button = document.getElementById("viewLink");
+        const uniqueID = button.dataset.uniqueId; // Retrieve stored uniqueID
+            
+        fetch(`/customer/?uniqueID=${uniqueID}`)
+                .then(response => response.json()) // Assuming the server returns JSON
+                .then(data => {
+                    if (data) {
+                        window.location.href = `/customer-live-updates.html?uniqueID=${uniqueID}`;
+                    } else {
+                        alert("Error: Invalid response from server.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error fetching reservation details:", error);
+                    alert("Failed to fetch reservation details.");
+                });
+        }
+
+    var subscriber = null;
+    window.onload = function () {
+      // Initialize factory with the most recent API defaults
+      var factoryProps = new solace.SolclientFactoryProperties();
+      factoryProps.profile = solace.SolclientFactoryProfiles.version10_5;
+      solace.SolclientFactory.init(factoryProps);
+
+      // enable logging to JavaScript console at WARN level
+      // NOTICE: works only with "solclientjs-debug.js"
+      solace.SolclientFactory.setLogLevel(solace.LogLevel.WARN);
+
+      // create the consumer, specifying name of the queue
+      subscriber = new QueueConsumer('testQueue');
+      // assign buttons to the subscriber functions
+      document.getElementById("connect").addEventListener("click", subscriber.connect);
+      document.getElementById("disconnect").addEventListener("click", subscriber.disconnect);
+      document.getElementById("startconsume").addEventListener("click", subscriber.startConsume);
+      document.getElementById("stopconsume").addEventListener("click", subscriber.stopConsume);
+      document.getElementById("clear").addEventListener("click", subscriber.clear);
+    };
+    function iframeloaded(){
+      if (subscriber) {
+          subscriber.connectToSolace();
+      }
+    };
+  </script>
 <body>
     <h2>Live Messages f</h2>
 
@@ -26,71 +75,6 @@
     </div>
 
     <script>
-        // ✅ Default Solace Broker Configuration
-        const solaceWebSocketURL = "ws://localhost:8008"; // Default Solace WebSocket URL
-        const vpnName = "default"; // Default VPN
-        const userName = "default"; // Default username
-        const password = ""; // Default password (empty unless set)
-        
-        const topicName = "Hello/updates"; // Listening to topic `/Hello`
-
-        let solaceSession = null;
-
-        function connectToSolace() {
-            console.log("🔌 Connecting to Solace...");
-
-            const sessionProperties = {
-                url: solaceWebSocketURL,
-                vpnName: vpnName,
-                userName: userName,
-                password: password,
-                clientName: "Client-" + new Date().getTime() // Adding a unique timestamp to client name
-
-            };
-
-            solaceSession = solace.SolclientFactory.createSession(sessionProperties);
-
-            solaceSession.on(solace.SessionEventCode.UP_NOTICE, function () {
-                console.log("✅ Connected to Solace Broker!");
-                subscribeToTopic(topicName);
-            });
-
-            solaceSession.on(solace.SessionEventCode.CONNECT_FAILED_ERROR, function (error) {
-                console.error("❌ Connection failed:", error);
-                document.getElementById("errorMessage").style.display = "block";
-            });
-
-
-
-            solaceSession.on(solace.SessionEventCode.MESSAGE, function (message) {
-                const receivedMessage = message.getText();  // Use getText() for text messages
-                console.log("📩 Message received:", receivedMessage);
-                displayMessage(receivedMessage);
-            });
-
-            solaceSession.connect();
-        }
-
-        function subscribeToTopic(topic) {
-            console.log(`📡 Subscribing to topic: ${topic}`);
-            const subscriptionTopic = solace.SolclientFactory.createTopic(topic);
-            solaceSession.subscribe(subscriptionTopic, true, topic, 10000);
-        }
-
-        function displayMessage(message) {
-            const messagesDiv = document.getElementById("messages");
-            const messageElement = document.createElement("div");
-            messageElement.classList.add("message");
-            messageElement.innerHTML = `<p>${message}</p>`;
-            messagesDiv.appendChild(messageElement);
-        }
-
-        window.onload = function () {
-            solace.SolclientFactory.init({
-                profile: solace.SolclientFactoryProfiles.version10
-            });
-            connectToSolace();
-        };
     </script>
 </body>
 </html>

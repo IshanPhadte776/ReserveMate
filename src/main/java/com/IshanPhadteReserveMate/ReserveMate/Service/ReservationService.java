@@ -57,9 +57,6 @@ public class ReservationService {
     }
 
     public boolean updateReservationStatus(String reservationID, String newStatus) {
-        System.out.println(reservationID);
-
-        System.out.println(getAllActiveReservations());
 
 
         Optional<Reservation> optionalReservation = reservationRepository.findReservationByReservationID(reservationID);

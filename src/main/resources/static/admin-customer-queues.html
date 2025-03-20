@@ -424,11 +424,6 @@
                 const responseData = await response.json();
                 console.log("Authentication status:", responseData.message);
 
-                // Check if the response contains restaurantID and employeeID
-                if (responseData.restaurantID && responseData.employeeID) {
-                    console.log("Restaurant ID:", responseData.restaurantID);
-                    console.log("Employee ID:", responseData.employeeID);
-                }
             }
         }
         
@@ -498,9 +493,6 @@
         }
 
         function createReservationItem(reservation) {
-
-            console.log(reservation);
-            console.log(reservation.reservationID);
 
             const listItem = document.createElement("div");
             listItem.className = "reservation-item";
