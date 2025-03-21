@@ -6,119 +6,384 @@
     <title>Real-time Solace Messages</title>
     <link rel="icon" href="http://localhost:8081/favicon.ico" type="image/x-icon">
     <script src="solclient.js"></script>
-    <!-- Load the Persistence with Queues - Queue Consumer  -->
     <script src="QueueConsumer.js"></script>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        h2 { color: #333; }
-        .message { background-color: #f0f0f0; padding: 10px; margin: 5px 0; border-radius: 5px; }
-        .error { color: red; }
+        :root {
+            --primary-dark: #05668D;    /* Dark blue */
+            --primary: #028090;         /* Medium blue */
+            --secondary: #00A896;       /* Teal */
+            --accent: #02C39A;          /* Light teal */
+            --light: #F0F3BD;           /* Light yellow/cream */
+            --text-dark: #333333;
+            --text-light: #FFFFFF;
+            --border-light: #E0E0E0;
+            --danger: #d9534f;
+            --success: #5cb85c;
+            --border-radius: 8px;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background-color: #f9f9f9;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background-color: var(--primary-dark);
+            color: var(--text-light);
+            padding: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .content {
+            padding: 20px;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .card-header {
+            background-color: var(--primary);
+            color: var(--text-light);
+            padding: 12px 15px;
+            font-weight: bold;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-body {
+            padding: 15px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-light);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            border: none;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--text-light);
+        }
+        
+        .btn-accent {
+            background-color: var(--accent);
+            color: var(--text-light);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: var(--text-light);
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: var(--text-light);
+        }
+        
+        .btn-light {
+            background-color: var(--light);
+            color: var(--text-dark);
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .connection-status {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #ccc;
+            margin-right: 8px;
+        }
+        
+        .connection-status.connected {
+            background-color: var(--success);
+        }
+        
+        .connection-status.disconnected {
+            background-color: var(--danger);
+        }
+        
+        .message-log {
+            height: 300px;
+            overflow-y: auto;
+            background-color: #f5f5f5;
+            border: 1px solid var(--border-light);
+            border-radius: 4px;
+            padding: 10px;
+            font-family: monospace;
+            margin-bottom: 15px;
+        }
+        
+        .message {
+            margin-bottom: 8px;
+            padding: 8px;
+            border-radius: 4px;
+            background-color: white;
+            border-left: 3px solid var(--secondary);
+        }
+        
+        .error {
+            color: var(--danger);
+            background-color: rgba(217, 83, 79, 0.1);
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .error svg {
+            margin-right: 10px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            font-size: 12px;
+            border-radius: 10px;
+            background-color: var(--light);
+            color: var(--text-dark);
+        }
+        
+        .badge-primary {
+            background-color: var(--accent);
+            color: var(--text-light);
+        }
+
+        .inner-card {
+            background-color: var(--light);
+            background-opacity: 0.5;
+        }
+        
+        .inner-card .card-header {
+            background-color: var(--secondary);
+        }
+
+        @media (max-width: 768px) {
+            .connection-details {
+                flex-direction: column;
+            }
+            
+            .form-group.connection-field {
+                margin-bottom: 10px;
+            }
+        }
     </style>
 </head>
-<script>
-
-    const urlParams = new URLSearchParams(window.location.search);
-
-    const reservationID = urlParams.get('reservationID');
-
-    // Log the parameters to the console
-    console.log("reservationID:", reservationID);
-
-    function fetchReservationDetails(reservationID) {
-
-        console.log(reservationID)
+<body>
+    <div class="container">
+        <header>
+            <h1>Real-time Solace Messages</h1>
+            <div class="subtitle">Reservation Updates Dashboard</div>
+        </header>
+        
+        <div class="content">
+            <div id="errorMessage" class="error hidden">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                    <path fill="currentColor" d="M7.5 1C3.91 1 1 3.91 1 7.5S3.91 14 7.5 14 14 11.09 14 7.5 11.09 1 7.5 1zm0 13C4.46 14 2 11.54 2 8.5S4.46 3 7.5 3 13 5.46 13 8.5 10.54 14 7.5 14z"/>
+                    <path fill="currentColor" d="M8 4h-1v5h1V4zm0 6h-1v1h1v-1z"/>
+                </svg>
+                <span>Could not receive updates. Please check your connection.</span>
+            </div>
             
-        fetch(`/customer/getReservationInfo/${reservationID}`)
-                .then(response => response.json()) // Assuming the server returns JSON
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <span class="connection-status" id="status-indicator"></span>
+                        <span id="connection-status-text">Disconnected</span>
+                    </div>
+                    <div class="button-group">
+                        <button type="button" class="btn btn-light" id="clear">Clear Log</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="connection-details" style="display: flex; gap: 15px; margin-bottom: 15px;">
+                    </div>
+                    
+                    <div class="card inner-card">
+                        <div class="card-header">
+                            <span>Message Queue: <span class="badge badge-primary" id="queue-name">-</span></span>
+                        </div>
+                        <div class="card-body">
+                            <div id="log" class="message-log"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const reservationID = urlParams.get('reservationID');
+        console.log("reservationID:", reservationID);
+        
+        var subscriber = null;
+        let connectionStatus = document.getElementById('status-indicator');
+        let connectionStatusText = document.getElementById('connection-status-text');
+        let queueNameBadge = document.getElementById('queue-name');
+        
+        // Update the log display
+        function updateLogDisplay(message) {
+            const logContainer = document.getElementById('log');
+            const messageElement = document.createElement('div');
+            messageElement.className = 'message';
+            messageElement.textContent = message;
+            logContainer.appendChild(messageElement);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+        
+        // Update connection status
+        function updateConnectionStatus(connected) {
+            if (connected) {
+                connectionStatus.className = 'connection-status connected';
+                connectionStatusText.textContent = 'Connected';
+            } else {
+                connectionStatus.className = 'connection-status disconnected';
+                connectionStatusText.textContent = 'Disconnected';
+            }
+        }
+        
+        function fetchReservationDetails(reservationID) {
+            console.log(reservationID);
+            
+            fetch(`/customer/getReservationInfo/${reservationID}`)
+                .then(response => response.json())
                 .then(data => {
                     if (data) {
-                        console.log(data)
-
+                        console.log(data);
+                        
+                        // Update queue name display
+                        queueNameBadge.textContent = `customerQueue/${data.uniqueID}`;
+                        
                         subscriber = new QueueConsumer('customerQueue/' + data.uniqueID);
-
+                        
                         if (subscriber) {
-                            subscriber.connectToSolace();
-
-                            // document.getElementById("connect").addEventListener("click", subscriber.connect);
-                            document.getElementById("disconnect").addEventListener("click", subscriber.disconnect);
-                            // document.getElementById("startconsume").addEventListener("click", subscriber.startConsume);
-                            document.getElementById("stopconsume").addEventListener("click", subscriber.stopConsume);
-                            document.getElementById("clear").addEventListener("click", subscriber.clear);
+                            // Override the log method to use our UI
+                            subscriber.log = function(line) {
+                                updateLogDisplay(line);
+                            };
                             
-                            const queueName = `customerQueue/${data.uniqueID}`; 
-                            subscriber.queueName = queueName; 
+                            // Override connection status methods
+                            const originalConnectSuccess = subscriber.connectSuccess;
+                            subscriber.connectSuccess = function() {
+                                updateConnectionStatus(true);
+                                if (originalConnectSuccess) originalConnectSuccess.call(subscriber);
+                            };
+                            
+                            const originalConnectFailed = subscriber.connectFailed;
+                            subscriber.connectFailed = function() {
+                                updateConnectionStatus(false);
+                                document.getElementById('errorMessage').classList.remove('hidden');
+                                if (originalConnectFailed) originalConnectFailed.call(subscriber);
+                            };
+                            
+                            subscriber.connectToSolace();
+                            
+                        
+                            
+                            const queueName = `customerQueue/${data.uniqueID}`;
+                            subscriber.queueName = queueName;
                             subscriber.connect();
-
+                            
                             setTimeout(() => {
                                 subscriber.startConsume();
-                            }, 2000); // Delay to ensure connection is established
-
-
+                            }, 2000);
                         }
-
                     } else {
-                        alert("Error: Invalid response from server.");
+                        document.getElementById('errorMessage').classList.remove('hidden');
                     }
                 })
                 .catch(error => {
                     console.error("Error fetching reservation details:", error);
-                    alert("Failed to fetch reservation details.");
+                    document.getElementById('errorMessage').classList.remove('hidden');
                 });
         }
-
-    var subscriber = null;
-    window.onload = function () {
-      // Initialize factory with the most recent API defaults
-      var factoryProps = new solace.SolclientFactoryProperties();
-      factoryProps.profile = solace.SolclientFactoryProfiles.version10_5;
-      solace.SolclientFactory.init(factoryProps);
-
-      // enable logging to JavaScript console at WARN level
-      // NOTICE: works only with "solclientjs-debug.js"
-      solace.SolclientFactory.setLogLevel(solace.LogLevel.WARN);
-
-      fetchReservationDetails(reservationID);
-
-      // create the consumer, specifying name of the queue
-      
-      // assign buttons to the subscriber functions
-
-    };
-    function iframeloaded(){
-      if (subscriber) {
-          subscriber.connectToSolace();
-      }
-    };
-  </script>
-<body>
-    <h2>Live Messages f</h2>
-
-    <!-- Message Section -->
-    <h3>Updates</h3>
-    <div id="messages"></div>
-
-    <!-- Error message -->
-    <div id="errorMessage" class="error" style="display: none;">
-        <p>Could not recieve updates</p>
-    </div>
-
-    <input id="hosturl" type="text" value="ws://localhost:8008">
-    <input id="message-vpn" type="text" placeholder="Message VPN" value="default">
-    <input id="username" type="text" placeholder="Username" value="admin">
-    <input id="password" type="password" placeholder="Password" value="admin">
-    <p>
-        <!-- <button type="button" class="pure-button pure-button-primary" id="connect">Connect</button> -->
-        <button type="button" class="pure-button button-error" id="disconnect">Disconnect</button>
-      </p>
-      <p>
-        <!-- <button type="button" class="pure-button pure-button-primary" id="startconsume">Consume messages </button> -->
-        <button type="button" class="pure-button button-error" id="stopconsume">Stop consuming</button>
-        <button type="button" class="pure-button pure-button-secondary right" id="clear">Clear</button>
-      </p>
-
-      <textarea id="log" rows="20" cols="90" autofocus></textarea>
-
-    <script>
+        
+        window.onload = function() {
+            // Initialize factory with the most recent API defaults
+            var factoryProps = new solace.SolclientFactoryProperties();
+            factoryProps.profile = solace.SolclientFactoryProfiles.version10_5;
+            solace.SolclientFactory.init(factoryProps);
+            
+            // enable logging to JavaScript console at WARN level
+            solace.SolclientFactory.setLogLevel(solace.LogLevel.WARN);
+            
+            fetchReservationDetails(reservationID);
+        };
+        
+        function iframeloaded() {
+            if (subscriber) {
+                subscriber.connectToSolace();
+            }
+        }
     </script>
 </body>
 </html>

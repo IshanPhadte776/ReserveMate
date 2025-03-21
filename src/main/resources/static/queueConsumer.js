@@ -54,21 +54,12 @@ var QueueConsumer = function (queueName) {
             consumer.log('Already connected and ready to consume messages.');
             return;
         }
-        var hosturl = document.getElementById('hosturl').value;
-        // check for valid protocols
-        if (hosturl.lastIndexOf('ws://', 0) !== 0 && hosturl.lastIndexOf('wss://', 0) !== 0 &&
-            hosturl.lastIndexOf('http://', 0) !== 0 && hosturl.lastIndexOf('https://', 0) !== 0) {
-            consumer.log('Invalid protocol - please use one of ws://, wss://, http://, https://');
-            return;
-        }
-        var username = document.getElementById('username').value;
-        var pass = document.getElementById('password').value;
-        var vpn = document.getElementById('message-vpn').value;
+        var hosturl = "ws://localhost:8008"
 
-        if (!hosturl || !username || !pass || !vpn) {
-            consumer.log('Cannot connect: please specify all the Solace PubSub+ Event Broker properties.');
-            return;
-        }
+        var username = "admin"
+        var pass = "admin"
+        var vpn = "default"
+
         consumer.log('Connecting to Solace PubSub+ Event Broker using url: ' + hosturl);
         consumer.log('Client username: ' + username);
         consumer.log('Solace PubSub+ Event Broker VPN name: ' + vpn);

@@ -714,6 +714,20 @@
             }
         }
 
+        function sendMessageToCustomer(){
+            fetch(`http://localhost:8081/messages/sendUpdates/${selectedReservation}/${customMessage}`, { method: "PUT" })
+                .then(response => {
+                    
+                    if (response.ok) {
+
+                    } else {
+                    }
+                })
+                .catch(error => {
+
+                });
+        }
+
         // Run authentication check when the page loads
         document.addEventListener('DOMContentLoaded', checkAuth);
         
