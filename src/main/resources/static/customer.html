@@ -41,13 +41,19 @@
 
                             // document.getElementById("connect").addEventListener("click", subscriber.connect);
                             document.getElementById("disconnect").addEventListener("click", subscriber.disconnect);
-                            document.getElementById("startconsume").addEventListener("click", subscriber.startConsume);
+                            // document.getElementById("startconsume").addEventListener("click", subscriber.startConsume);
                             document.getElementById("stopconsume").addEventListener("click", subscriber.stopConsume);
                             document.getElementById("clear").addEventListener("click", subscriber.clear);
                             
                             const queueName = `customerQueue/${data.uniqueID}`; 
                             subscriber.queueName = queueName; 
                             subscriber.connect();
+
+                            setTimeout(() => {
+                                subscriber.startConsume();
+                            }, 2000); // Delay to ensure connection is established
+
+
                         }
 
                     } else {
@@ -105,7 +111,7 @@
         <button type="button" class="pure-button button-error" id="disconnect">Disconnect</button>
       </p>
       <p>
-        <button type="button" class="pure-button pure-button-primary" id="startconsume">Consume messages </button>
+        <!-- <button type="button" class="pure-button pure-button-primary" id="startconsume">Consume messages </button> -->
         <button type="button" class="pure-button button-error" id="stopconsume">Stop consuming</button>
         <button type="button" class="pure-button pure-button-secondary right" id="clear">Clear</button>
       </p>

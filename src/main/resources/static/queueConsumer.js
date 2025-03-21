@@ -64,10 +64,6 @@ var QueueConsumer = function (queueName) {
         var username = document.getElementById('username').value;
         var pass = document.getElementById('password').value;
         var vpn = document.getElementById('message-vpn').value;
-        console.log(hosturl)
-        console.log(username)
-        console.log(pass)
-        console.log(vpn)
 
         if (!hosturl || !username || !pass || !vpn) {
             consumer.log('Cannot connect: please specify all the Solace PubSub+ Event Broker properties.');
