@@ -27,8 +27,6 @@
     function fetchReservationDetails(reservationID) {
 
         console.log(reservationID)
-        // const button = document.getElementById("viewLink");
-        // const uniqueID = button.dataset.uniqueId; // Retrieve stored uniqueID
             
         fetch(`/customer/getReservationInfo/${reservationID}`)
                 .then(response => response.json()) // Assuming the server returns JSON
@@ -41,11 +39,15 @@
                         if (subscriber) {
                             subscriber.connectToSolace();
 
-                            document.getElementById("connect").addEventListener("click", subscriber.connect);
+                            // document.getElementById("connect").addEventListener("click", subscriber.connect);
                             document.getElementById("disconnect").addEventListener("click", subscriber.disconnect);
                             document.getElementById("startconsume").addEventListener("click", subscriber.startConsume);
                             document.getElementById("stopconsume").addEventListener("click", subscriber.stopConsume);
                             document.getElementById("clear").addEventListener("click", subscriber.clear);
+                            
+                            const queueName = `customerQueue/${data.uniqueID}`; 
+                            subscriber.queueName = queueName; 
+                            subscriber.connect();
                         }
 
                     } else {
@@ -96,10 +98,10 @@
 
     <input id="hosturl" type="text" value="ws://localhost:8008">
     <input id="message-vpn" type="text" placeholder="Message VPN" value="default">
-    <input id="username" type="text" placeholder="Username">
-    <input id="password" type="password" placeholder="Password">
+    <input id="username" type="text" placeholder="Username" value="admin">
+    <input id="password" type="password" placeholder="Password" value="admin">
     <p>
-        <button type="button" class="pure-button pure-button-primary" id="connect">Connect</button>
+        <!-- <button type="button" class="pure-button pure-button-primary" id="connect">Connect</button> -->
         <button type="button" class="pure-button button-error" id="disconnect">Disconnect</button>
       </p>
       <p>
