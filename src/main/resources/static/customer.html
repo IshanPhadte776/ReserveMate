@@ -17,11 +17,18 @@
 </head>
 <script>
 
+    const urlParams = new URLSearchParams(window.location.search);
+
+    const reservationID = urlParams.get('reservationID');
+
+    // Log the parameters to the console
+    console.log("reservationID:", reservationID);
+
     function fetchReservationDetails() {
         const button = document.getElementById("viewLink");
         const uniqueID = button.dataset.uniqueId; // Retrieve stored uniqueID
             
-        fetch(`/customer/?uniqueID=${uniqueID}`)
+        fetch(`/customer/getReservationInfo/${reservationID}`)
                 .then(response => response.json()) // Assuming the server returns JSON
                 .then(data => {
                     if (data) {
@@ -48,7 +55,7 @@
       solace.SolclientFactory.setLogLevel(solace.LogLevel.WARN);
 
       // create the consumer, specifying name of the queue
-      subscriber = new QueueConsumer('testQueue');
+      subscriber = new QueueConsumer('customerQueue/14fdcf07-ca07-4113-b737-19c848e3657e');
       // assign buttons to the subscriber functions
       document.getElementById("connect").addEventListener("click", subscriber.connect);
       document.getElementById("disconnect").addEventListener("click", subscriber.disconnect);
@@ -73,6 +80,22 @@
     <div id="errorMessage" class="error" style="display: none;">
         <p>Could not recieve updates</p>
     </div>
+
+    <input id="hosturl" type="text" value="ws://localhost:8008">
+    <input id="message-vpn" type="text" placeholder="Message VPN" value="default">
+    <input id="username" type="text" placeholder="Username">
+    <input id="password" type="password" placeholder="Password">
+    <p>
+        <button type="button" class="pure-button pure-button-primary" id="connect">Connect</button>
+        <button type="button" class="pure-button button-error" id="disconnect">Disconnect</button>
+      </p>
+      <p>
+        <button type="button" class="pure-button pure-button-primary" id="startconsume">Consume messages </button>
+        <button type="button" class="pure-button button-error" id="stopconsume">Stop consuming</button>
+        <button type="button" class="pure-button pure-button-secondary right" id="clear">Clear</button>
+      </p>
+
+      <textarea id="log" rows="20" cols="90" autofocus></textarea>
 
     <script>
     </script>
