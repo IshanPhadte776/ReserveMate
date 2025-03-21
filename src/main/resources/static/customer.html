@@ -24,15 +24,30 @@
     // Log the parameters to the console
     console.log("reservationID:", reservationID);
 
-    function fetchReservationDetails() {
-        const button = document.getElementById("viewLink");
-        const uniqueID = button.dataset.uniqueId; // Retrieve stored uniqueID
+    function fetchReservationDetails(reservationID) {
+
+        console.log(reservationID)
+        // const button = document.getElementById("viewLink");
+        // const uniqueID = button.dataset.uniqueId; // Retrieve stored uniqueID
             
         fetch(`/customer/getReservationInfo/${reservationID}`)
                 .then(response => response.json()) // Assuming the server returns JSON
                 .then(data => {
                     if (data) {
                         console.log(data)
+
+                        subscriber = new QueueConsumer('customerQueue/' + data.uniqueID);
+
+                        if (subscriber) {
+                            subscriber.connectToSolace();
+
+                            document.getElementById("connect").addEventListener("click", subscriber.connect);
+                            document.getElementById("disconnect").addEventListener("click", subscriber.disconnect);
+                            document.getElementById("startconsume").addEventListener("click", subscriber.startConsume);
+                            document.getElementById("stopconsume").addEventListener("click", subscriber.stopConsume);
+                            document.getElementById("clear").addEventListener("click", subscriber.clear);
+                        }
+
                     } else {
                         alert("Error: Invalid response from server.");
                     }
@@ -54,14 +69,12 @@
       // NOTICE: works only with "solclientjs-debug.js"
       solace.SolclientFactory.setLogLevel(solace.LogLevel.WARN);
 
+      fetchReservationDetails(reservationID);
+
       // create the consumer, specifying name of the queue
-      subscriber = new QueueConsumer('customerQueue/14fdcf07-ca07-4113-b737-19c848e3657e');
+      
       // assign buttons to the subscriber functions
-      document.getElementById("connect").addEventListener("click", subscriber.connect);
-      document.getElementById("disconnect").addEventListener("click", subscriber.disconnect);
-      document.getElementById("startconsume").addEventListener("click", subscriber.startConsume);
-      document.getElementById("stopconsume").addEventListener("click", subscriber.stopConsume);
-      document.getElementById("clear").addEventListener("click", subscriber.clear);
+
     };
     function iframeloaded(){
       if (subscriber) {
